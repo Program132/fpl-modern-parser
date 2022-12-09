@@ -17,7 +17,7 @@ namespace FPL::Tokenizer {
             OPERATEUR
         };
 
-        static const char *sAllTokenTypes[] = {
+        inline constexpr const char *sAllTokenTypes[] = {
                 "ESPACE_VIDE",
                 "IDENTIFIANT",
                 "ENTIER",
@@ -31,7 +31,7 @@ namespace FPL::Tokenizer {
         public:
             enum TokenTypes TokenType;
             std::string TokenText;
-            [[maybe_unused]] size_t TokenLineNumber = 0;
+            size_t TokenLineNumber {0};
 
             friend std::ostream& operator<<(std::ostream& flux, Token const& token);
         };

@@ -112,7 +112,7 @@ namespace FPL::Tokenizer {
     }
 
     std::ostream &operator<<(std::ostream &flux, const Token &token) {
-        flux << "(Token Flux: " << token.TokenText << ", " << sAllTokenTypes[token.TokenType] << ")";
+        flux << "(Token Flux: " << token.TokenText << ", " << FPL::Tokenizer::sAllTokenTypes[token.TokenType] << ")";
         return flux;
     }
 }
