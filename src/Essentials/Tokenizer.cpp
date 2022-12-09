@@ -74,15 +74,13 @@ namespace FPL::Tokenizer {
                     if (currentToken.TokenType != CHAINE_LITTERAL) {
                         TokenBuilder::ParseEndToken(currentToken, AllTokens);
                         currentToken.TokenType = CHAINE_LITTERAL;
-                        currentToken.TokenText.append(1, element);
                     } else if (currentToken.TokenType == CHAINE_LITTERAL) {
                         TokenBuilder::ParseEndToken(currentToken, AllTokens);
                     }
                     break;
 
                 default:
-                    if (currentToken.TokenType == ESPACE_VIDE || currentToken.TokenType == ENTIER ||
-                        currentToken.TokenType == DECIMAL) {
+                    if (currentToken.TokenType == ESPACE_VIDE || currentToken.TokenType == ENTIER || currentToken.TokenType == DECIMAL) {
                         TokenBuilder::ParseEndToken(currentToken, AllTokens);
                         currentToken.TokenType = IDENTIFIANT;
                         currentToken.TokenText.append(1, element);
