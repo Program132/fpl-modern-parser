@@ -10,11 +10,11 @@ namespace FPL::Tokenizer {
         enum TokenTypes {
             ESPACE_VIDE,
             IDENTIFIANT,
-            ENTIER, // Int
-            DECIMAL, // Double
+            ENTIER,
+            DECIMAL,
             PEUTETRE_DECIMAL,
-            CHAINE_LITTERAL, // Strings
-            OPERATEUR // Opérateurs comme +, -, /, *,...
+            CHAINE_LITTERAL,
+            OPERATEUR
         };
 
         static const char *sAllTokenTypes[] = {
