@@ -20,11 +20,11 @@ namespace FPL::Tokenizer {
         static const char *sAllTokenTypes[] = {
                 "ESPACE_VIDE",
                 "IDENTIFIANT",
-                "ENTIER", // Int
-                "DECIMAL", // Double
+                "ENTIER",
+                "DECIMAL",
                 "PEUTETRE_DECIMAL",
-                "CHAINE_LITTERAL", // Strings
-                "OPERATEUR" // Opérateurs comme +, -, /, *,...
+                "CHAINE_LITTERAL",
+                "OPERATEUR"
         };
 
         class Token {
