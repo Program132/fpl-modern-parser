@@ -17,6 +17,7 @@ namespace FPL::Tokenizer {
             OPERATEUR
         };
 
+        // Une copie sera faite au max, constexpr permet de mettre à disponible dès la compilation
         inline constexpr const char *sAllTokenTypes[] = {
                 "ESPACE_VIDE",
                 "IDENTIFIANT",
