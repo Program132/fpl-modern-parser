@@ -16,7 +16,10 @@ namespace FPL::Tokenizer {
             DECIMAL,
             PEUTETRE_DECIMAL,
             CHAINE_LITTERAL,
-            OPERATEUR
+            OPERATEUR,
+            STRING_ESCAPE_SEQUENCE,
+            PEUTETRE_COMMENT,
+            COMMENT
         };
 
         // Une copie sera faite au max, constexpr permet de mettre à disponible dès la compilation
@@ -27,7 +30,10 @@ namespace FPL::Tokenizer {
                 "DECIMAL",
                 "PEUTETRE_DECIMAL",
                 "CHAINE_LITTERAL",
-                "OPERATEUR"
+                "OPERATEUR",
+                "STRING_ESCAPE_SEQUENCE",
+                "PEUTETRE_COMMENT",
+                "COMMENT"
         };
 
         class Token {
