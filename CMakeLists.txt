@@ -20,4 +20,6 @@ add_executable(fpl-modern-parser
         src/Essentials/Utils/Data.cpp
         src/Essentials/Utils/Data.h
         src/Essentials/Utils/ErrorsCodeManagement.cpp
-        src/Essentials/Utils/ErrorsCodeManagement.h)
+        src/Essentials/Utils/ErrorsCodeManagement.h
+        src/Essentials/Definitions/Variables.cpp
+        src/Essentials/Definitions/Variables.h src/Essentials/MathUtils/Converts.h src/Essentials/MathUtils/Converts.cpp)
