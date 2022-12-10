@@ -23,7 +23,11 @@ namespace FPL::Tokenizer {
                     } else if (currentToken.TokenType == PEUTETRE_DECIMAL) {
                         currentToken.TokenType = DECIMAL;
                         currentToken.TokenText.append(1, element);
-                    } else {
+                    } else if (currentToken.TokenType == IDENTIFIANT) {
+                        TokenBuilder::ParseEndToken(currentToken, AllTokens);
+                        currentToken.TokenType = ENTIER;
+                        currentToken.TokenText.append(1, element);
+                    }  else {
                         currentToken.TokenText.append(1, element);
                     }
                     break;
