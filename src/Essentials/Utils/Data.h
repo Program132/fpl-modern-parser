@@ -12,7 +12,7 @@ namespace FPL::Data {
 
     class Data {
     public:
-        Data(std::vector<FPL::Tokenizer::Token>& Tokens);
+        explicit Data(std::vector<FPL::Tokenizer::Token>& Tokens);
 
         std::vector<Token>::iterator current_token; // Le token que le Parser analyze
         std::vector<Token>::iterator end_token; // Le dernier token sauvegardé
