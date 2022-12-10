@@ -4,7 +4,7 @@ using namespace FPL;
 using namespace FPL::Data;
 using namespace FPL::Tokenizer;
 
-std::optional<Token> ExpectIdentifiant(FPL::Data::Data& data, std::string_view name) {
+std::optional<Token> ExpectIdentifiant(FPL::Data::Data &data, std::string_view name) {
     if (data.current_token == data.end_token) { return std::nullopt; }
     if (data.current_token->TokenType != Tokenizer::IDENTIFIANT) { return std::nullopt; }
     if (!name.empty() && data.current_token->TokenText != name) { return std::nullopt; }
@@ -14,7 +14,7 @@ std::optional<Token> ExpectIdentifiant(FPL::Data::Data& data, std::string_view n
     return *returnToken;
 }
 
-std::optional<Token> ExpectOperator(FPL::Data::Data& data, std::string_view name) {
+std::optional<Token> ExpectOperator(FPL::Data::Data &data, std::string_view name) {
     if (data.current_token == data.end_token) { return std::nullopt; }
     if (data.current_token->TokenType != Tokenizer::OPERATEUR) { return std::nullopt; }
     if (data.current_token->TokenText != name && !name.empty()) { return std::nullopt; }
@@ -24,7 +24,7 @@ std::optional<Token> ExpectOperator(FPL::Data::Data& data, std::string_view name
     return *returnToken;
 }
 
-std::optional<Types::Types> ExpectType(FPL::Data::Data& data) {
+std::optional<Types::Types> ExpectType(FPL::Data::Data &data) {
     auto possibleType = ExpectIdentifiant(data);
     if (!possibleType.has_value()) { return std::nullopt; }
 
@@ -37,29 +37,24 @@ std::optional<Types::Types> ExpectType(FPL::Data::Data& data) {
     return foundType->second;
 }
 
-std::optional<Statement::Statement> ExpectValue(FPL::Data::Data& data) {
+std::optional<Statement::Statement> ExpectValue(FPL::Data::Data &data) {
     std::optional<Statement::Statement> res;
 
-    if (data.current_token->TokenType == FPL::Tokenizer::DECIMAL)
-    {
-        Statement::Statement doubleLitteralStatement (
+    if (data.current_token->TokenType == FPL::Tokenizer::DECIMAL) {
+        Statement::Statement doubleLitteralStatement(
                 Statement::StatementKind::LITTERAL,
                 data.current_token->TokenText,
                 Types::Types("decimal", FPL::Types::STRING)
         );
         res = doubleLitteralStatement;
-    }
-    else if (data.current_token->TokenType == Tokenizer::ENTIER)
-    {
+    } else if (data.current_token->TokenType == Tokenizer::ENTIER) {
         Statement::Statement integerLitteralStatement(
                 Statement::StatementKind::LITTERAL,
                 data.current_token->TokenText,
                 Types::Types("entier", Types::STRING)
         );
         res = integerLitteralStatement;
-    }
-    else if (data.current_token->TokenType == Tokenizer::CHAINE_LITTERAL)
-    {
+    } else if (data.current_token->TokenType == Tokenizer::CHAINE_LITTERAL) {
         Statement::Statement stringLitteralStatement(
                 Statement::StatementKind::LITTERAL,
                 data.current_token->TokenText,
@@ -75,11 +70,29 @@ std::optional<Statement::Statement> ExpectValue(FPL::Data::Data& data) {
     return res;
 }
 
-bool ExpectEgalOperators(FPL::Data::Data& data) {
+bool ExpectEgalOperators(FPL::Data::Data &data) {
     if (ExpectOperator(data, "-").has_value()) {
         if (ExpectOperator(data, ">").has_value()) {
             return true;
         }
     }
     return false;
+}
+
+std::optional<std::string> ExpectOperatorCondition(FPL::Data::Data &data) {
+    // Ops : <, >, =, <=, >=
+
+    auto const firstOp = ExpectOperator(data);
+    auto const secondOp = ExpectOperator(data);
+    if (firstOp.has_value() && secondOp.has_value()) {
+        if (firstOp->TokenText == "<" && secondOp->TokenText == "=") { return "<="; }
+        else if (firstOp->TokenText == ">" && secondOp->TokenText == "=") { return ">="; }
+        else { wrongOperatorCondition(data); }
+    } else if (firstOp.has_value()) {
+        if (firstOp->TokenText == "=") { return "="; }
+        else if (firstOp->TokenText == ">") { return ">"; }
+        else if (firstOp->TokenText == "<") { return "<"; }
+        else { wrongOperatorCondition(data); }
+    }
+    return std::nullopt;
 }
