@@ -100,7 +100,9 @@ namespace FPL::Tokenizer {
     }
 
     void TokenBuilder::ParseEndToken(Token &token, std::vector<Token> &tokens) {
-        if (token.TokenType != ESPACE_VIDE) {
+        token.TokenText.erase(std::remove_if(token.TokenText.begin(), token.TokenText.end(), ::isspace), token.TokenText.end());
+
+        if (token.TokenType != ESPACE_VIDE && !token.TokenText.empty() && token.TokenText != " ") {
             tokens.push_back(token);
         }
 

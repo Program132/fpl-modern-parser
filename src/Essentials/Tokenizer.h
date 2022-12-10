@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 #include <ostream>
+#include <cctype>
+#include <algorithm>
 
 namespace FPL::Tokenizer {
 
