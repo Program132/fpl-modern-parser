@@ -13,4 +13,11 @@ add_executable(fpl-modern-parser
         src/Essentials/Parser.h
         src/Essentials/Types.cpp
         src/Essentials/Types.h
-        src/Essentials/Statement.cpp src/Essentials/Statement.h src/Essentials/Utils/Expecter.cpp src/Essentials/Utils/Expecter.h src/Essentials/Utils/Data.cpp src/Essentials/Utils/Data.h)
+        src/Essentials/Statement.cpp
+        src/Essentials/Statement.h
+        src/Essentials/Utils/Expecter.cpp
+        src/Essentials/Utils/Expecter.h
+        src/Essentials/Utils/Data.cpp
+        src/Essentials/Utils/Data.h
+        src/Essentials/Utils/ErrorsCodeManagement.cpp
+        src/Essentials/Utils/ErrorsCodeManagement.h)
