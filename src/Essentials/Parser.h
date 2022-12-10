@@ -7,20 +7,18 @@
 #include <optional>
 
 #include "Tokenizer.h"
-
 #include "Utils/Expecter.h"
+#include "Utils/ErrorsCodeManagement.h"
 
 namespace FPL::Parser {
     class Parser {
     public:
-        //Parser();
-
         static void ParserCode(std::vector<FPL::Tokenizer::Token>& Tokens);
+
     private:
+        static bool ManagerInstruction(FPL::Data::Data &data);
 
-        //std::vector<std::string> InstructionsList;
-        //std::map<std::string, FPL::Types::Types> AllFPLTypes;
-
-        static bool PrintInstruction(FPL::Data::Data& data);
+        static void PrintInstruction(FPL::Data::Data& data);
+        static void VariableInstruction(FPL::Data::Data& data);
     };
 }
