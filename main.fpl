@@ -1,1 +1,6 @@
 envoyer "Yo cv ? moi ca va, " 5 " voici le chiffre cinq !";
+
+variable entier maVariable -> 5;
+variable decimal maVariabl -> 10.5;
+
+envoyer "Salut";
