@@ -1,6 +1,9 @@
-envoyer "Yo cv ? moi ca va, " 5 " voici le chiffre cinq !";
+variable entier a -> 10;
+envoyer a = 10 ", mmh...";
 
-variable entier maVariable -> 5;
-variable decimal maVariabl -> 10.5;
-
-envoyer "Salut";
+variable entier b -> 9;
+envoyer "Les valeurs a et b sont-elles egales : " a = b ".";
+envoyer "a est sup a b : " a > b ".";
+envoyer "a est inf a b : " a < b ".";
+envoyer "a est sup ou egal a b : " a >= b " " a <= b".";
+envoyer "a est inf ou egal a b : " a <= b " " a >= b".";
