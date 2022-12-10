@@ -12,5 +12,19 @@ namespace FPL::Data {
 
         current_token = Tokens.begin();
         end_token = Tokens.end();
+
+        InstructionsList = {
+                // Instructions:
+                "envoyer",
+                "variable",
+                // Types:
+                "entier",
+                "decimal",
+                "texte",
+                "auto",
+                "bool",
+                "boolean",
+                "vide"
+        };
     }
 }
