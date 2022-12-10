@@ -5,6 +5,8 @@ namespace FPL::Tokenizer {
         std::vector<Token> AllTokens;
         Token currentToken;
 
+        currentToken.TokenLineNumber = 1;
+
         for (auto const &element: contentFile) {
             if (currentToken.TokenType == STRING_ESCAPE_SEQUENCE) {
                 switch (element) {
