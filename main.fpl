@@ -1,1 +1,4 @@
 envoyer 5.25;
+
+envoyer 5 + 5;
+envoyer 10 / 5;;
