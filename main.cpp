@@ -2,6 +2,7 @@
 #include <fstream>
 
 #include "src/Essentials/Tokenizer.h"
+#include "src/Essentials/Parser.h"
 
 using namespace FPL;
 
@@ -25,9 +26,8 @@ int main(int argc, char** argv) {
 
     std::vector<Tokenizer::Token> FileCode_Tokens = FPL::Tokenizer::TokenBuilder::ParseToken(FileCode);
 
-    for (Tokenizer::Token const& e : FileCode_Tokens) {
-        std::cout << e << std::endl;
-    }
+    FPL::Parser::Parser parser;
+    parser.ParserCode(FileCode_Tokens);
 
     return 0;
 }
