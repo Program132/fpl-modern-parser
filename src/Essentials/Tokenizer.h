@@ -30,7 +30,7 @@ namespace FPL::Tokenizer {
 
         class Token {
         public:
-            enum TokenTypes TokenType;
+            enum TokenTypes TokenType = ESPACE_VIDE;
             std::string TokenText;
             size_t TokenLineNumber {0};
 
