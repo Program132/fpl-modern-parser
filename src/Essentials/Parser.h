@@ -9,6 +9,8 @@
 #include "Tokenizer.h"
 #include "Utils/Expecter.h"
 #include "Utils/ErrorsCodeManagement.h"
+#include "Definitions/Variables.h"
+#include "MathUtils/Converts.h"
 
 namespace FPL::Parser {
     class Parser {
