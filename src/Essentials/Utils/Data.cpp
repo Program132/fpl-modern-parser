@@ -27,4 +27,25 @@ namespace FPL::Data {
                 "vide"
         };
     }
+
+    void Data::addVariableToMap(std::string name, std::string value, FPL::Types::Types type) {
+        VariableDef newVariable;
+        newVariable.VariableName = name;
+        newVariable.VariableValue = value;
+        newVariable.VariableType = type;
+        Map_Variables[newVariable.VariableName] = newVariable;
+    }
+
+    bool Data::isVariable(std::string name) {
+        if (Map_Variables.contains(name)) { return true; }
+        return false;
+    }
+
+    std::optional<FPL::VariableDef> Data::getVariable(std::string name) {
+        if (isVariable(name)) {
+            VariableDef var = Map_Variables[name];
+            return var;
+        }
+        return std::nullopt;
+    }
 }
