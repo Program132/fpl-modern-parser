@@ -18,3 +18,5 @@ std::optional<Statement::Statement> ExpectValue(FPL::Data::Data& data);
 std::optional<Types::Types> ExpectType(FPL::Data::Data& data);
 std::optional<Token> ExpectOperator(FPL::Data::Data& data, std::string_view name = std::string());
 std::optional<Token> ExpectIdentifiant(FPL::Data::Data& data, std::string_view name = std::string());
+
+bool ExpectEgalOperators(FPL::Data::Data& data);

@@ -39,6 +39,7 @@ std::optional<Types::Types> ExpectType(FPL::Data::Data& data) {
 
 std::optional<Statement::Statement> ExpectValue(FPL::Data::Data& data) {
     std::optional<Statement::Statement> res;
+
     if (data.current_token->TokenType == FPL::Tokenizer::DECIMAL)
     {
         Statement::Statement doubleLitteralStatement (
@@ -72,4 +73,13 @@ std::optional<Statement::Statement> ExpectValue(FPL::Data::Data& data) {
 
     data.current_token++;
     return res;
+}
+
+bool ExpectEgalOperators(FPL::Data::Data& data) {
+    if (ExpectOperator(data, "-").has_value()) {
+        if (ExpectOperator(data, ">").has_value()) {
+            return true;
+        }
+    }
+    return false;
 }
