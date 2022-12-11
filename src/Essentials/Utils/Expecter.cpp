@@ -83,6 +83,9 @@ std::optional<std::string> ExpectOperatorCondition(FPL::Data::Data &data) {
     // Ops : <, >, =, <=, >=
 
     auto const firstOp = ExpectOperator(data);
+    if (firstOp.has_value() && firstOp->TokenText == ";") {
+        return std::nullopt;
+    }
     auto const secondOp = ExpectOperator(data);
     if (firstOp.has_value() && secondOp.has_value()) {
         if (firstOp->TokenText == "<" && secondOp->TokenText == "=") { return "<="; }
