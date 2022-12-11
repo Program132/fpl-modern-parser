@@ -28,4 +28,4 @@ add_executable(fpl-modern-parser
         src/Essentials/MathUtils/Converts.cpp
 
         src/Instructions/Print.cpp
-        src/Instructions/Print.h src/Instructions/Inputs.cpp src/Instructions/Inputs.h)
+        src/Instructions/Print.h src/Instructions/Inputs.cpp src/Instructions/Inputs.h src/Essentials/MathUtils/MathParser/MathTokenizer.cpp src/Essentials/MathUtils/MathParser/MathTokenizer.h src/Essentials/MathUtils/MathParser/MathParser.cpp src/Essentials/MathUtils/MathParser/MathParser.h src/Essentials/MathUtils/MathParser/Utils/Converts.cpp src/Essentials/MathUtils/MathParser/Utils/Converts.h src/Essentials/Utils/Vectors.cpp src/Essentials/Utils/Vectors.h)
