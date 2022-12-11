@@ -1,5 +1,7 @@
 #include "Data.h"
 
+#include <utility>
+
 namespace FPL::Data {
     Data::Data(std::vector<FPL::Tokenizer::Token>& Tokens) {
         AllFPLTypes["entier"] = FPL::Types::Types("entier", Types::BUILTIN_TYPE::INT);
@@ -46,5 +48,26 @@ namespace FPL::Data {
             return var;
         }
         return std::nullopt;
+    }
+
+    std::vector<Token>::iterator Data::incrementeAndGetToken(FPL::Data::Data& data) {
+        data.current_token++;
+        return data.current_token;
+    }
+
+    void Data::decrementeTokens(Data &data) {
+        data.current_token--;
+    }
+
+    void Data::updateValue(std::string &name, std::basic_string<char> value) {
+        if (isVariable(name)) {
+            Map_Variables[name].VariableValue = std::move(value);
+        }
+    }
+
+    void Data::updateType(std::string &name, Types::Types type) {
+        if (isVariable(name)) {
+            Map_Variables[name].VariableType = std::move(type);
+        }
     }
 }
