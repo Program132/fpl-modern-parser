@@ -11,6 +11,8 @@
 #include "Utils/ErrorsCodeManagement.h"
 #include "Definitions/Variables.h"
 #include "MathUtils/Converts.h"
+#include "../Instructions/Print.h"
+#include "../Instructions/Inputs.h"
 
 namespace FPL::Parser {
     class Parser {
@@ -22,5 +24,6 @@ namespace FPL::Parser {
 
         static void PrintInstruction(FPL::Data::Data& data);
         static void VariableInstruction(FPL::Data::Data& data);
+        static void InputInstruction(FPL::Data::Data& data);
     };
 }
