@@ -71,3 +71,9 @@ void needValueNextOperatorCondition(FPL::Data::Data& data) {
               << data.current_token->TokenLineNumber - 1 << "." << std::endl;
     exit(12);
 }
+
+void inputTypeError(FPL::Data::Data& data) {
+    std::cerr << "Votre reponse a l'entree clavier comporte un type non similaire a votre type preciser, ligne "
+              << data.current_token->TokenLineNumber - 1 << "." << std::endl;
+    exit(13);
+}
