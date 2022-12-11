@@ -1,6 +1,6 @@
 #include "Print.h"
 
-namespace FPL::Instruction {
+namespace FPL::Instruction::Print {
     void operatorCondReturnFalseTrue_INT(std::string operatorCond, int a, int b) {
         if (operatorCond == "=") {
             if (a == b) { std::cout << "vrai"; } else { std::cout << "faux"; }
