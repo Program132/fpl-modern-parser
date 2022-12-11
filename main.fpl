@@ -1,2 +1,8 @@
-saisir entier a -> "Votre age ?";
+math z -> 10 + 5 * 2 / 5;
+envoyer z;
+
+math a -> 10zaz + az5 z* a2 / 5;
 envoyer a;
+
+math b -> azzaazaz + 5 * 2 / 5;
+envoyer b;
