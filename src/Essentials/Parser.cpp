@@ -2,6 +2,46 @@
 
 namespace FPL::Parser {
 
+    void Parser::MathInstruction(FPL::Data::Data& data) {
+        auto possibleName = ExpectIdentifiant(data);
+        if (possibleName.has_value()) {
+            if (ExpectEgalOperators(data)) {
+                std::vector<std::string> MathInsContent_Vector;
+                data.decrementeTokens(data);
+                while (!ExpectOperator(data, ";").has_value()) {
+                    auto CurrT = data.incrementeAndGetToken(data);
+                    if (CurrT->TokenText != ";") {
+                        MathInsContent_Vector.push_back(CurrT->TokenText);
+                    }
+
+                    if (ExpectOperator(data, ";").has_value()) {
+                        break;
+                    }
+                }
+                std::string MathInsContent = StringVectorTOString(MathInsContent_Vector);
+
+                std::vector<MathParser::Token> contentMathTokens = MathParser::TokenBuilding::ParserTokens(MathInsContent);
+                double result = MATHPARSER_Parser(contentMathTokens);
+
+                if (data.isVariable(possibleName->TokenText)) {
+                    auto variable = data.getVariable(possibleName->TokenText);
+                    data.updateValue(variable->VariableName, std::to_string(result));
+                    data.updateType(variable->VariableName, FPL::Types::Types("decimal", FPL::Types::DOUBLE));
+                } else {
+                    VariableDef variable;
+                    variable.VariableName = possibleName->TokenText;
+                    variable.VariableType = FPL::Types::Types("decimal", FPL::Types::DOUBLE);
+                    variable.VariableValue = std::to_string(result);
+                    data.addVariableToMap(variable.VariableName, variable.VariableValue, variable.VariableType);
+                }
+            } else {
+                forgotEgalOperators(data);
+            }
+        } else {
+            forgotName(data);
+        }
+    }
+
     void Parser::InputInstruction(FPL::Data::Data& data) {
         auto possibleType = ExpectType(data);
         if (possibleType.has_value()) {
@@ -217,6 +257,8 @@ namespace FPL::Parser {
         }
     }
 
+
+
     bool Parser::ManagerInstruction(FPL::Data::Data &data) {
         auto Instruction = ExpectIdentifiant(data);
         if (Instruction.has_value()) {
@@ -228,6 +270,9 @@ namespace FPL::Parser {
                 return true;
             } else if (Instruction->TokenText == "saisir") {
                 InputInstruction(data);
+                return true;
+            } else if (Instruction->TokenText == "math") {
+                MathInstruction(data);
                 return true;
             }
         }
