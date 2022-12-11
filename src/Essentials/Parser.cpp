@@ -19,26 +19,7 @@ namespace FPL::Parser {
                             std::cout << Content_CIN_Value->StatementName << std::endl;
                         }
 
-                        std::string finalValue;
-                        if (possibleType->Type == FPL::Types::INT) {
-                            int v;
-                            std::cin >> v;
-                            finalValue = std::to_string(v);
-                            if (finalValue == "0" || v == 0) {
-                                inputTypeError(data);
-                            }
-                            std::cout << std::endl;
-                        } else if (possibleType->Type == FPL::Types::DOUBLE) {
-                            double v;
-                            std::cin >> v;
-                            finalValue = std::to_string(v);
-                            if (finalValue == "0" || v == 0) {
-                                inputTypeError(data);
-                            }
-                            std::cout << std::endl;
-                        } else {
-                            std::cin >> finalValue;
-                        }
+                        std::string finalValue = FPL::Instruction::Inputs::returnInputFinalValue(possibleType->Type, data);
 
                         if (possibleType->Type == FPL::Types::BOOL) {
                             if (finalValue != "vrai" && finalValue != "faux") {
@@ -62,26 +43,7 @@ namespace FPL::Parser {
                     }
                 } else { // Si on n'affiche rien dans la console...
                     if (ExpectOperator(data, ";").has_value()) {
-                        std::string finalValue;
-                        if (possibleType->Type == FPL::Types::INT) {
-                            int v;
-                            std::cin >> v;
-                            finalValue = std::to_string(v);
-                            if (finalValue == "0" || v == 0) {
-                                inputTypeError(data);
-                            }
-                            std::cout << std::endl;
-                        } else if (possibleType->Type == FPL::Types::DOUBLE) {
-                            double v;
-                            std::cin >> v;
-                            finalValue = std::to_string(v);
-                            if (finalValue == "0" || v == 0) {
-                                inputTypeError(data);
-                            }
-                            std::cout << std::endl;
-                        } else {
-                            std::cin >> finalValue;
-                        }
+                        std::string finalValue = FPL::Instruction::Inputs::returnInputFinalValue(possibleType->Type, data);
 
                         if (possibleType->Type == FPL::Types::BOOL) {
                             if (finalValue != "vrai" && finalValue != "faux") {
