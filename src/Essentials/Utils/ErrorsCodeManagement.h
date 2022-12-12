@@ -15,3 +15,4 @@ void wrongOperatorCondition(FPL::Data::Data& data);
 void needValueNextOperatorCondition(FPL::Data::Data& data);
 void variableDoesNotExist(FPL::Data::Data& data);
 void inputTypeError(FPL::Data::Data& data);
+void wrongType(FPL::Data::Data& data);

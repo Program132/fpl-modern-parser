@@ -77,3 +77,9 @@ void inputTypeError(FPL::Data::Data& data) {
               << data.current_token->TokenLineNumber - 1 << "." << std::endl;
     exit(13);
 }
+
+void wrongType(FPL::Data::Data& data) {
+    std::cerr << "Le type de la valeur preciser n'est pas valide, ligne "
+              << data.current_token->TokenLineNumber - 1 << "." << std::endl;
+    exit(13);
+}
