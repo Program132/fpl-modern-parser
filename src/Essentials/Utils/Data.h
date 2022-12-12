@@ -21,6 +21,7 @@ namespace FPL::Data {
 
         std::vector<Token>::iterator incrementeAndGetToken(FPL::Data::Data& data);
         void decrementeTokens(FPL::Data::Data& data);
+        void incremeneTokens(FPL::Data::Data& data);
 
         std::map<std::string, FPL::Types::Types> AllFPLTypes;
         std::vector<std::string> InstructionsList;

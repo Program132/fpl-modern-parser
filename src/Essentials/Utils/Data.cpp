@@ -59,6 +59,10 @@ namespace FPL::Data {
         data.current_token--;
     }
 
+    void Data::incremeneTokens(FPL::Data::Data &data) {
+        data.current_token++;
+    }
+
     void Data::updateValue(std::string &name, std::basic_string<char> value) {
         if (isVariable(name)) {
             Map_Variables[name].VariableValue = std::move(value);
