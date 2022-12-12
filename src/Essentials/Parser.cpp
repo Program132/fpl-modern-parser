@@ -115,59 +115,58 @@ namespace FPL::Parser {
             if (Value.has_value()) {
                 std::cout << Value->StatementName;
             }
+
             auto Id = ExpectIdentifiant(data);
             if (Id.has_value()) {
                 auto var = data.getVariable(Id->TokenText);
-                auto operatorCond = ExpectOperatorCondition(data);
-                if (operatorCond.has_value()) {
-                    std::cout << 2 << std::endl;
-                    int valueInt = stringToInt(var->VariableValue, "");
-                    double valueDouble = stringToDouble(var->VariableValue, "");
 
-                    auto nextValue = ExpectValue(data);
-                    if (nextValue.has_value()) {
-                        if (var->VariableType.Name != nextValue->StatementType.Name && var->VariableType.Type != Types::BUILTIN_TYPE::BOOL) {
-                            differentTypes(data);
-                        }
+                if (var.has_value()) {
+                    std::string secondOp = "N/A";
 
-                        if (var->VariableType.Type == Types::BUILTIN_TYPE::INT) {
-                            int nextValueInt = stringToInt(nextValue->StatementName, "");
-                            Instruction::Print::operatorCondReturnFalseTrue_INT(operatorCond.value(), valueInt, nextValueInt);
-                        } else if (var->VariableType.Type == Types::BUILTIN_TYPE::DOUBLE) {
-                            double nextValueDouble = stringToDouble(nextValue->StatementName, "");
-                            Instruction::Print::operatorCondReturnFalseTrue_DOUBLE(operatorCond.value(), valueDouble, nextValueDouble);
-                        } else {
-                            needValueNextOperatorCondition(data);
-                        }
-                    } else {
-                        auto nextId = ExpectIdentifiant(data);
-                        if (nextId.has_value()) {
-                            if (data.isVariable(nextId->TokenText)) {
-                                auto nextVar = data.getVariable(nextId->TokenText);
-                                if (var->VariableType.Name != nextVar->VariableType.Name && var->VariableType.Type != Types::BUILTIN_TYPE::BOOL) {
-                                    differentTypes(data);
-                                }
+                    if (data.current_token->TokenText == "<") {
+                        secondOp = "<";
+                        data.incremeneTokens(data);
+                    } else if (data.current_token->TokenText == ">") {
+                        secondOp = ">";
+                        data.incremeneTokens(data);
+                    }
 
-                                if (var->VariableType.Type == Types::BUILTIN_TYPE::INT) {
-                                    int nextValueInt = stringToInt(nextVar->VariableValue, "");
-                                    Instruction::Print::operatorCondReturnFalseTrue_INT(operatorCond.value(), valueInt, nextValueInt);
-                                } else if (var->VariableType.Type == Types::BUILTIN_TYPE::DOUBLE) {
-                                    double nextValueDouble = stringToDouble(nextVar->VariableValue, "");
-                                    Instruction::Print::operatorCondReturnFalseTrue_DOUBLE(operatorCond.value(), valueDouble, nextValueDouble);
-                                } else {
-                                    needValueNextOperatorCondition(data);
-                                }
-                            } else{
-                                variableDoesNotExist(data);
+                    if (data.current_token->TokenText == "=") {
+                        data.incremeneTokens(data);
+                        auto conditionValue = ExpectValue(data);
+                        if (conditionValue.has_value()) {
+                            if (conditionValue->StatementType.Name != "entier" && conditionValue->StatementType.Name != "decimal") {
+                                wrongType(data);
+                            }
+
+                            if (var->VariableType.Type == Types::INT) {
+                                int varValue = stringToInt(var->VariableValue, "");
+                                int v = stringToInt(conditionValue->StatementName, "");
+                                FPL::Instruction::Prints::printWithOperatorCondition_INT(secondOp, varValue, v);
+                            } else if (var->VariableType.Type == Types::DOUBLE) {
+                                double varValue = stringToDouble(var->VariableValue, ""); // La valeur de la variable
+                                double v = stringToDouble(conditionValue->StatementName, ""); // L'autre valeur après l'/les opérateur(s)
+                                FPL::Instruction::Prints::printWithOperatorCondition_DOUBLE(secondOp, varValue, v);
                             }
                         } else {
                             needValueNextOperatorCondition(data);
                         }
-                    }
-                }
-                else { // S'il n'y a pas d'opérateur de condition
-                    if (var.has_value()) {
-                        std::cout << var->VariableValue;
+                    } else {
+                        if (secondOp != "N/A") {
+                            data.incremeneTokens(data);
+                            auto conditionValue = ExpectValue(data);
+                            if (var->VariableType.Type == Types::INT) {
+                                int varValue = stringToInt(var->VariableValue, "");
+                                int v = stringToInt(conditionValue->StatementName, "");
+                                FPL::Instruction::Prints::printWithOperatorCondition_INT(secondOp, varValue, v);
+                            } else if (var->VariableType.Type == Types::DOUBLE) {
+                                double varValue = stringToDouble(var->VariableValue, ""); // La valeur de la variable
+                                double v = stringToDouble(conditionValue->StatementName, ""); // L'autre valeur après l'/les opérateur(s)
+                                FPL::Instruction::Prints::printWithOperatorCondition_DOUBLE(secondOp, varValue, v);
+                            }
+                        } else {
+                            std::cout << var->VariableValue;
+                        }
                     }
                 }
             }

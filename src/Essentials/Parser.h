@@ -14,7 +14,7 @@
 #include "Definitions/Variables.h"
 #include "MathUtils/Converts.h"
 
-#include "../Instructions/Print.h"
+#include "../Instructions/Prints.h"
 #include "../Instructions/Inputs.h"
 
 #include "MathUtils/MathParser/MathParser.h"
