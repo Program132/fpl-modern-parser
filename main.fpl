@@ -1,8 +1,6 @@
-math z -> 10 + 5 * 2 / 5;
-envoyer z;
-
-math a -> 10zaz + az5 z* a2 / 5;
-envoyer a;
-
-math b -> azzaazaz + 5 * 2 / 5;
-envoyer b;
+math b -> 5 + 10;
+envoyer "La valeur de b (decimal) : " b;
+envoyer "b est inf ou egal ? " b <= 20;
+envoyer b >= 20;
+envoyer b < 20;
+envoyer b >= 20;
