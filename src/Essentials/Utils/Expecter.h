@@ -21,4 +21,3 @@ std::optional<Token> ExpectOperator(FPL::Data::Data& data, std::string_view name
 std::optional<Token> ExpectIdentifiant(FPL::Data::Data& data, std::string_view name = std::string());
 
 bool ExpectEgalOperators(FPL::Data::Data& data);
-std::optional<std::string> ExpectOperatorCondition(FPL::Data::Data &data);
