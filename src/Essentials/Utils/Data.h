@@ -21,7 +21,7 @@ namespace FPL::Data {
 
         std::vector<Token>::iterator incrementeAndGetToken(FPL::Data::Data& data);
         void decrementeTokens(FPL::Data::Data& data);
-        void incremeneTokens(FPL::Data::Data& data);
+        void incrementeTokens(FPL::Data::Data& data);
 
         std::map<std::string, FPL::Types::Types> AllFPLTypes;
         std::vector<std::string> InstructionsList;
@@ -31,6 +31,6 @@ namespace FPL::Data {
         bool isVariable(std::string& name) const;
         std::optional<FPL::VariableDef> getVariable(std::string& name);
         void updateValue(std::string &name, std::basic_string<char> value);
-        void updateType(std::string &name, Types::Types type);
+        void updateType(std::string& name, std::string& TypeName, Types::BUILTIN_TYPE Type);
     };
 }

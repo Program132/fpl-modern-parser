@@ -59,7 +59,7 @@ namespace FPL::Data {
         data.current_token--;
     }
 
-    void Data::incremeneTokens(FPL::Data::Data &data) {
+    void Data::incrementeTokens(FPL::Data::Data &data) {
         data.current_token++;
     }
 
@@ -69,9 +69,10 @@ namespace FPL::Data {
         }
     }
 
-    void Data::updateType(std::string &name, Types::Types type) {
+    void Data::updateType(std::string& name, std::string& TypeName, Types::BUILTIN_TYPE Type) {
         if (isVariable(name)) {
-            Map_Variables[name].VariableType = std::move(type);
+            Map_Variables[name].VariableType.Name = TypeName;
+            Map_Variables[name].VariableType.Type = Type;
         }
     }
 }
