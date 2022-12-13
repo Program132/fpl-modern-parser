@@ -60,26 +60,32 @@ void wrongTypeForBool(FPL::Data::Data& data) {
     exit(10);
 }
 
-void wrongOperatorCondition(FPL::Data::Data& data) {
-    std::cerr << "L'operateur conditionnelle que vous avez utilise n'est pas disponible, il n'existe que '<=' '>=' '<' '>' ou '=', ligne "
-              << data.current_token->TokenLineNumber - 1 << "." << std::endl;
-    exit(11);
-}
-
 void needValueNextOperatorCondition(FPL::Data::Data& data) {
     std::cerr << "Apres votre operateur conditionnelle vous devez specifier une valeur, ligne "
               << data.current_token->TokenLineNumber - 1 << "." << std::endl;
-    exit(12);
+    exit(11);
 }
 
 void inputTypeError(FPL::Data::Data& data) {
     std::cerr << "Votre reponse a l'entree clavier comporte un type non similaire a votre type preciser, ligne "
               << data.current_token->TokenLineNumber - 1 << "." << std::endl;
-    exit(13);
+    exit(12);
 }
 
 void wrongType(FPL::Data::Data& data) {
     std::cerr << "Le type de la valeur preciser n'est pas valide, ligne "
               << data.current_token->TokenLineNumber - 1 << "." << std::endl;
     exit(13);
+}
+
+void CONVERSION_sameTypeVariable(FPL::Data::Data& data) {
+    std::cerr << "Le type precise est le meme que le type de votre variable dans votre conversion donc aucun changement n'est necessaire, ligne "
+              << data.current_token->TokenLineNumber - 1 << "." << std::endl;
+    exit(14);
+}
+
+void CONVERSION_boolNumberFromInt(FPL::Data::Data& data) {
+    std::cerr << "La variable doit etre de type 'entier' (int) et doit contenir 1 pour 'vrai' et 0 pour 'faux', ligne "
+              << data.current_token->TokenLineNumber - 1 << "." << std::endl;
+    exit(15);
 }
