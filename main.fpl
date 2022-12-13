@@ -1,6 +1,9 @@
 math b -> 5 + 10;
 envoyer "La valeur de b (decimal) : " b;
-envoyer "b est inf ou egal ? " b <= 20;
-envoyer b >= 20;
-envoyer b < 20;
-envoyer b >= 20;
+convertir b entier;
+envoyer "La valeur de b (entier) : " b;
+
+variable entier a -> 1;
+envoyer a;
+convertir a bool;
+envoyer a;
