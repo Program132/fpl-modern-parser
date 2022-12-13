@@ -15,8 +15,14 @@ namespace FPL::Parser {
                     data.updateType(variable->VariableName, possibleNewType->Name, possibleNewType->Type);
                     variable = data.getVariable(variable->VariableName);
                     if (variable->VariableType.Type == Types::BUILTIN_TYPE::INT) {
-                        int v = stringToInt(variable->VariableValue, "");
-                        data.updateValue(variable->VariableName, std::to_string(v));
+                        if (variable->VariableValue == "vrai") {
+                            data.updateValue(variable->VariableName, "1");
+                        } else if (variable->VariableValue == "faux") {
+                            data.updateValue(variable->VariableName, "0");
+                        } else {
+                            int v = stringToInt(variable->VariableValue, "");
+                            data.updateValue(variable->VariableName, std::to_string(v));
+                        }
                     } else if (variable->VariableType.Type == Types::BUILTIN_TYPE::DOUBLE) {
                         double v = stringToDouble(variable->VariableValue, "");
                         data.updateValue(variable->VariableName, std::to_string(v));
