@@ -2,6 +2,44 @@
 
 namespace FPL::Parser {
 
+    void Parser::ConversionInstruction(FPL::Data::Data& data) {
+        auto possibleVariable = ExpectIdentifiant(data);
+        if (possibleVariable.has_value() && data.isVariable(possibleVariable->TokenText)) {
+            auto variable = data.getVariable(possibleVariable->TokenText);
+            auto possibleNewType = ExpectType(data);
+            if (possibleNewType.has_value()) {
+                if (ExpectOperator(data, ";").has_value()) {
+                    if (possibleNewType->Type == variable->VariableType.Type) {
+                        CONVERSION_sameTypeVariable(data);
+                    }
+                    data.updateType(variable->VariableName, possibleNewType->Name, possibleNewType->Type);
+                    variable = data.getVariable(variable->VariableName);
+                    if (variable->VariableType.Type == Types::BUILTIN_TYPE::INT) {
+                        int v = stringToInt(variable->VariableValue, "");
+                        data.updateValue(variable->VariableName, std::to_string(v));
+                    } else if (variable->VariableType.Type == Types::BUILTIN_TYPE::DOUBLE) {
+                        double v = stringToDouble(variable->VariableValue, "");
+                        data.updateValue(variable->VariableName, std::to_string(v));
+                    } else if (variable->VariableType.Type == Types::BUILTIN_TYPE::BOOL) {
+                        if (variable->VariableValue == "1") {
+                            data.updateValue(variable->VariableName, "vrai");
+                        } else if (variable->VariableValue == "0") {
+                            data.updateValue(variable->VariableName, "faux");
+                        } else {
+                            CONVERSION_boolNumberFromInt(data);
+                        }
+                    }
+                } else {
+                    forgotEndInstructionOperator(data);
+                }
+            } else {
+                forgotType(data);
+            }
+        } else {
+            variableDoesNotExist(data);
+        }
+    }
+
     void Parser::MathInstruction(FPL::Data::Data& data) {
         auto possibleName = ExpectIdentifiant(data);
         if (possibleName.has_value()) {
@@ -25,8 +63,9 @@ namespace FPL::Parser {
 
                 if (data.isVariable(possibleName->TokenText)) {
                     auto variable = data.getVariable(possibleName->TokenText);
+                    std::string newTypeName = "decimal";
                     data.updateValue(variable->VariableName, std::to_string(result));
-                    data.updateType(variable->VariableName, FPL::Types::Types("decimal", FPL::Types::DOUBLE));
+                    data.updateType(variable->VariableName, newTypeName, FPL::Types::BUILTIN_TYPE::DOUBLE);
                 } else {
                     VariableDef variable;
                     variable.VariableName = possibleName->TokenText;
@@ -109,75 +148,6 @@ namespace FPL::Parser {
         }
     }
 
-    void Parser::PrintInstruction(FPL::Data::Data& data) {
-        while (!ExpectOperator(data, ";").has_value()) {
-            auto Value = ExpectValue(data);
-            if (Value.has_value()) {
-                std::cout << Value->StatementName;
-            }
-
-            auto Id = ExpectIdentifiant(data);
-            if (Id.has_value()) {
-                auto var = data.getVariable(Id->TokenText);
-
-                if (var.has_value()) {
-                    std::string secondOp = "N/A";
-
-                    if (data.current_token->TokenText == "<") {
-                        secondOp = "<";
-                        data.incremeneTokens(data);
-                    } else if (data.current_token->TokenText == ">") {
-                        secondOp = ">";
-                        data.incremeneTokens(data);
-                    }
-
-                    if (data.current_token->TokenText == "=") {
-                        data.incremeneTokens(data);
-                        auto conditionValue = ExpectValue(data);
-                        if (conditionValue.has_value()) {
-                            if (conditionValue->StatementType.Name != "entier" && conditionValue->StatementType.Name != "decimal") {
-                                wrongType(data);
-                            }
-
-                            if (var->VariableType.Type == Types::INT) {
-                                int varValue = stringToInt(var->VariableValue, "");
-                                int v = stringToInt(conditionValue->StatementName, "");
-                                FPL::Instruction::Prints::printWithOperatorCondition_INT(secondOp, varValue, v);
-                            } else if (var->VariableType.Type == Types::DOUBLE) {
-                                double varValue = stringToDouble(var->VariableValue, ""); // La valeur de la variable
-                                double v = stringToDouble(conditionValue->StatementName, ""); // L'autre valeur après l'/les opérateur(s)
-                                FPL::Instruction::Prints::printWithOperatorCondition_DOUBLE(secondOp, varValue, v);
-                            }
-                        } else {
-                            needValueNextOperatorCondition(data);
-                        }
-                    } else {
-                        if (secondOp != "N/A") {
-                            data.incremeneTokens(data);
-                            auto conditionValue = ExpectValue(data);
-                            if (var->VariableType.Type == Types::INT) {
-                                int varValue = stringToInt(var->VariableValue, "");
-                                int v = stringToInt(conditionValue->StatementName, "");
-                                FPL::Instruction::Prints::printWithOperatorCondition_INT(secondOp, varValue, v);
-                            } else if (var->VariableType.Type == Types::DOUBLE) {
-                                double varValue = stringToDouble(var->VariableValue, ""); // La valeur de la variable
-                                double v = stringToDouble(conditionValue->StatementName, ""); // L'autre valeur après l'/les opérateur(s)
-                                FPL::Instruction::Prints::printWithOperatorCondition_DOUBLE(secondOp, varValue, v);
-                            }
-                        } else {
-                            std::cout << var->VariableValue;
-                        }
-                    }
-                }
-            }
-
-            if (ExpectOperator(data, ";").has_value()) {
-                break;
-            }
-        }
-        std::cout << std::endl;
-    }
-
     void Parser::VariableInstruction(FPL::Data::Data &data) {
         auto possibleType = ExpectType(data);
         if (possibleType.has_value()) {
@@ -256,6 +226,75 @@ namespace FPL::Parser {
         }
     }
 
+    void Parser::PrintInstruction(FPL::Data::Data& data) {
+        while (!ExpectOperator(data, ";").has_value()) {
+            auto Value = ExpectValue(data);
+            if (Value.has_value()) {
+                std::cout << Value->StatementName;
+            }
+
+            auto Id = ExpectIdentifiant(data);
+            if (Id.has_value()) {
+                auto var = data.getVariable(Id->TokenText);
+
+                if (var.has_value()) {
+                    std::string secondOp = "N/A";
+
+                    if (data.current_token->TokenText == "<") {
+                        secondOp = "<";
+                        data.incrementeTokens(data);
+                    } else if (data.current_token->TokenText == ">") {
+                        secondOp = ">";
+                        data.incrementeTokens(data);
+                    }
+
+                    if (data.current_token->TokenText == "=") {
+                        data.incrementeTokens(data);
+                        auto conditionValue = ExpectValue(data);
+                        if (conditionValue.has_value()) {
+                            if (conditionValue->StatementType.Name != "entier" && conditionValue->StatementType.Name != "decimal") {
+                                wrongType(data);
+                            }
+
+                            if (var->VariableType.Type == Types::INT) {
+                                int varValue = stringToInt(var->VariableValue, "");
+                                int v = stringToInt(conditionValue->StatementName, "");
+                                FPL::Instruction::Prints::printWithOperatorCondition_INT(secondOp, varValue, v);
+                            } else if (var->VariableType.Type == Types::DOUBLE) {
+                                double varValue = stringToDouble(var->VariableValue, ""); // La valeur de la variable
+                                double v = stringToDouble(conditionValue->StatementName, ""); // L'autre valeur après l'/les opérateur(s)
+                                FPL::Instruction::Prints::printWithOperatorCondition_DOUBLE(secondOp, varValue, v);
+                            }
+                        } else {
+                            needValueNextOperatorCondition(data);
+                        }
+                    } else {
+                        if (secondOp != "N/A") {
+                            data.incrementeTokens(data);
+                            auto conditionValue = ExpectValue(data);
+                            if (var->VariableType.Type == Types::INT) {
+                                int varValue = stringToInt(var->VariableValue, "");
+                                int v = stringToInt(conditionValue->StatementName, "");
+                                FPL::Instruction::Prints::printWithOperatorCondition_INT(secondOp, varValue, v);
+                            } else if (var->VariableType.Type == Types::DOUBLE) {
+                                double varValue = stringToDouble(var->VariableValue, ""); // La valeur de la variable
+                                double v = stringToDouble(conditionValue->StatementName, ""); // L'autre valeur après l'/les opérateur(s)
+                                FPL::Instruction::Prints::printWithOperatorCondition_DOUBLE(secondOp, varValue, v);
+                            }
+                        } else {
+                            std::cout << var->VariableValue;
+                        }
+                    }
+                }
+            }
+
+            if (ExpectOperator(data, ";").has_value()) {
+                break;
+            }
+        }
+        std::cout << std::endl;
+    }
+
 
 
     bool Parser::ManagerInstruction(FPL::Data::Data &data) {
@@ -273,10 +312,15 @@ namespace FPL::Parser {
             } else if (Instruction->TokenText == "math") {
                 MathInstruction(data);
                 return true;
+            } else if (Instruction->TokenText == "convertir") {
+                ConversionInstruction(data);
+                return true;
             }
         }
         return false;
     }
+
+
 
     void Parser::ParserCode(std::vector<FPL::Tokenizer::Token>& Tokens) {
         Data::Data data(Tokens);
