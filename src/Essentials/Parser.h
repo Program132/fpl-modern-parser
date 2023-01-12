@@ -29,6 +29,7 @@ namespace FPL::Parser {
 
         static void PrintInstruction(FPL::Data::Data& data);
         static void VariableInstruction(FPL::Data::Data& data);
+        static void ChangerInstruction(FPL::Data::Data& data);
         static void InputInstruction(FPL::Data::Data& data);
         static void MathInstruction(FPL::Data::Data& data);
         static void ConversionInstruction(FPL::Data::Data& data);

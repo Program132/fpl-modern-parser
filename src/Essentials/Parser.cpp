@@ -154,6 +154,45 @@ namespace FPL::Parser {
         }
     }
 
+    void Parser::ChangerInstruction(FPL::Data::Data& data) {
+        auto Nom_Variable = ExpectIdentifiant(data);
+        if (Nom_Variable.has_value() && data.isVariable(Nom_Variable->TokenText)) {
+
+            auto variable = data.getVariable(Nom_Variable->TokenText);
+
+            if (ExpectEgalOperators(data)) {
+                auto New_Value = ExpectValue(data);
+
+                if (ExpectOperator(data, ";").has_value()) {
+                    if (New_Value.has_value()) {
+                        if (variable->VariableType.Type == New_Value->StatementType.Type) {
+                            data.updateValue(variable->VariableName, New_Value->StatementName);
+                        } else {
+                            differentTypes(data);
+                        }
+                    } else {
+                        if (variable->VariableType.Type == Types::BOOL) {
+                            auto bool_value = ExpectIdentifiant(data);
+                            if (bool_value->TokenText != "vrai" && bool_value->TokenText != "faux") {
+                                wrongTypeForBool(data);
+                            }
+
+                            data.updateValue(variable->VariableName, bool_value->TokenText);
+                        } else {
+                            forgotValue(data);
+                        }
+                    }
+                } else {
+                    forgotEndInstructionOperator(data);
+                }
+            } else{
+                forgotEgalOperators(data);
+            }
+        } else {
+            variableDoesNotExist(data);
+        }
+    }
+
     void Parser::VariableInstruction(FPL::Data::Data &data) {
         auto possibleType = ExpectType(data);
         if (possibleType.has_value()) {
@@ -311,6 +350,9 @@ namespace FPL::Parser {
                 return true;
             } else if (Instruction->TokenText == "variable") {
                 VariableInstruction(data);
+                return true;
+            } else if (Instruction->TokenText == "changer") {
+                ChangerInstruction(data);
                 return true;
             } else if (Instruction->TokenText == "saisir") {
                 InputInstruction(data);
