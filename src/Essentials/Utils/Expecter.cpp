@@ -44,14 +44,14 @@ std::optional<Statement::Statement> ExpectValue(FPL::Data::Data &data) {
         Statement::Statement doubleLitteralStatement(
                 Statement::StatementKind::LITTERAL,
                 data.current_token->TokenText,
-                Types::Types("decimal", FPL::Types::STRING)
+                Types::Types("decimal", FPL::Types::DOUBLE)
         );
         res = doubleLitteralStatement;
     } else if (data.current_token->TokenType == Tokenizer::ENTIER) {
         Statement::Statement integerLitteralStatement(
                 Statement::StatementKind::LITTERAL,
                 data.current_token->TokenText,
-                Types::Types("entier", Types::STRING)
+                Types::Types("entier", Types::INT)
         );
         res = integerLitteralStatement;
     } else if (data.current_token->TokenType == Tokenizer::CHAINE_LITTERAL) {
