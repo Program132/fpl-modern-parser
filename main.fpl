@@ -1,11 +1,7 @@
-math b -> 5 + 10;
-envoyer "La valeur de b (decimal) : " b;
-convertir b entier;
-envoyer "La valeur de b (entier) : " b;
-
-variable entier a -> 1;
-envoyer a;
-convertir a bool;
-envoyer a;
+math a -> 5 + 7;
+envoyer "La valeur de a (decimal) : " a;
 convertir a entier;
+envoyer "La valeur de a (entier) : " a;
+
+changer a -> 10;
 envoyer a;
