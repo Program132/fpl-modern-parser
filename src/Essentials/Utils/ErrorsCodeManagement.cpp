@@ -89,3 +89,45 @@ void CONVERSION_boolNumberFromInt(FPL::Data::Data& data) {
               << data.current_token->TokenLineNumber - 1 << "." << std::endl;
     exit(15);
 }
+
+void FONCTION_forgotfirstParenthese(FPL::Data::Data& data) {
+    std::cerr << "Vous devez ouvrir les parentheses pour inserer des arguments si vous le souhaitez, ligne "
+              << data.current_token->TokenLineNumber - 1 << "." << std::endl;
+    exit(16);
+}
+
+void FONCTION_forgotsecondParenthese(FPL::Data::Data& data) {
+    std::cerr << "Vous devez fermer les parentheses pour cloturer l'insertion des arguments si vous en avez mis, ligne "
+              << data.current_token->TokenLineNumber - 1 << "." << std::endl;
+    exit(17);
+}
+
+void FONCTION_forgotargtype(FPL::Data::Data& data) {
+    std::cerr << "Vous devez donner un le type de votre argument, ligne "
+              << data.current_token->TokenLineNumber - 1 << "." << std::endl;
+    exit(18);
+}
+
+void FONCTION_forgotargname(FPL::Data::Data& data) {
+    std::cerr << "Vous devez donner un le nom de votre argument, ligne "
+              << data.current_token->TokenLineNumber - 1 << "." << std::endl;
+    exit(19);
+}
+
+void FONCTION_forgotaddarg(FPL::Data::Data& data) {
+    std::cerr << "Vous devez separer vos argument avec une ',', ligne "
+              << data.current_token->TokenLineNumber - 1 << "." << std::endl;
+    exit(20);
+}
+
+void FONCTION_forgotinsertcode(FPL::Data::Data& data) {
+    std::cerr << "Vous devez ouvrir et fermer avec '{' et '}' pour inserer votre code, ligne "
+              << data.current_token->TokenLineNumber - 1 << "." << std::endl;
+    exit(21);
+}
+
+void FONCTION_argumentexist(FPL::Data::Data& data) {
+    std::cerr << "L'argument existe deja, merci de donner un autre nom, ligne "
+              << data.current_token->TokenLineNumber - 1 << "." << std::endl;
+    exit(22);
+}
