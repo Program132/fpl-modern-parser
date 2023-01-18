@@ -6,13 +6,14 @@
 #include <map>
 #include <optional>
 
-
 #include "Tokenizer.h"
 #include "Utils/Expecter.h"
 #include "Utils/ErrorsCodeManagement.h"
 #include "Utils/Vectors.h"
-#include "Definitions/Variables.h"
 #include "MathUtils/Converts.h"
+
+#include "Definitions/Variables.h"
+#include "Definitions/Fonction.h"
 
 #include "../Instructions/Prints.h"
 #include "../Instructions/Inputs.h"
@@ -33,5 +34,7 @@ namespace FPL::Parser {
         static void InputInstruction(FPL::Data::Data& data);
         static void MathInstruction(FPL::Data::Data& data);
         static void ConversionInstruction(FPL::Data::Data& data);
+
+        static void DefinirInstruction(FPL::Data::Data& data);
     };
 }

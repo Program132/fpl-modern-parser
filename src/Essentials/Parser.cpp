@@ -2,6 +2,65 @@
 
 namespace FPL::Parser {
 
+    void Parser::DefinirInstruction(FPL::Data::Data& data) {
+        auto FonctionPossibleName = ExpectIdentifiant(data);
+        if (FonctionPossibleName.has_value()) {
+            FonctionDef fonction;
+            fonction.FonctionName = FonctionPossibleName->TokenText;
+
+            if (ExpectOperator(data, "(").has_value()) {
+                // On récupère le(s) argument(s) de la fonction (ou pas)
+                while (!ExpectOperator(data, ")").has_value()) {
+                    auto possibleArgType = ExpectType(data);
+                    if (!possibleArgType.has_value()) {
+                        FONCTION_forgotargtype(data);
+                    }
+
+                    auto possibleArgName = ExpectIdentifiant(data);
+                    if (!possibleArgName.has_value()) {
+                        FONCTION_forgotargname(data);
+                    }
+
+                    FonctionArgumentDef argument;
+                    argument.ArgumentName = possibleArgName->TokenText;
+                    argument.ArgumentType = Types::Types(possibleArgType->Name, possibleArgType->Type);
+
+                    if (fonction.isArgument(argument)) {
+                        FONCTION_argumentexist(data);
+                    }
+
+                    fonction.FonctionNumberArgument += 1;
+                    fonction.FonctionArguments.push_back(argument);
+
+                    if (ExpectOperator(data, ")").has_value()) {
+                        break;
+                    } else if (!ExpectOperator(data, ",").has_value()) {
+                        FONCTION_forgotaddarg(data);
+                    }
+                }
+
+                if (ExpectOperator(data, "{").has_value()) {
+                    // On récupère le contenu de la fonction
+                    while (!ExpectOperator(data, "}").has_value()) {
+                        auto currentToken = data.current_token;
+                        fonction.FonctionContentCode.push_back(currentToken->TokenText);
+                        data.incrementeTokens(data);
+
+                        if (ExpectOperator(data, "}").has_value()) { break; }
+                    }
+
+                    data.Map_Fonctions[fonction.FonctionName] = fonction;
+                } else {
+                    FONCTION_forgotinsertcode(data);
+                }
+            } else {
+                FONCTION_forgotfirstParenthese(data);
+            }
+        } else {
+            forgotName(data);
+        }
+    }
+
     void Parser::ConversionInstruction(FPL::Data::Data& data) {
         auto possibleVariable = ExpectIdentifiant(data);
         if (possibleVariable.has_value() && data.isVariable(possibleVariable->TokenText)) {
@@ -362,6 +421,9 @@ namespace FPL::Parser {
                 return true;
             } else if (Instruction->TokenText == "convertir") {
                 ConversionInstruction(data);
+                return true;
+            } else if (Instruction->TokenText == "definir") {
+                DefinirInstruction(data);
                 return true;
             }
         }
