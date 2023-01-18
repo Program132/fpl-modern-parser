@@ -1,7 +1,3 @@
-math a -> 5 + 7;
-envoyer "La valeur de a (decimal) : " a;
-convertir a entier;
-envoyer "La valeur de a (entier) : " a;
-
-changer a -> 10;
-envoyer a;
+definir main(entier a, entier b) {
+    envoyer a;
+}
