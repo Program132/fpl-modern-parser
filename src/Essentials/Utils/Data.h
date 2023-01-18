@@ -8,6 +8,7 @@
 #include "../Types.h"
 #include "../Tokenizer.h"
 #include "../Definitions/Variables.h"
+#include "../Definitions/Fonction.h"
 
 namespace FPL::Data {
     using namespace FPL::Tokenizer;
@@ -26,6 +27,7 @@ namespace FPL::Data {
         std::map<std::string, FPL::Types::Types> AllFPLTypes;
         std::vector<std::string> InstructionsList;
         std::map<std::string, FPL::VariableDef> Map_Variables;
+        std::map<std::string, FPL::FonctionDef> Map_Fonctions;
 
         void addVariableToMap(std::string& name, std::string& value, FPL::Types::Types& type);
         bool isVariable(std::string& name) const;
