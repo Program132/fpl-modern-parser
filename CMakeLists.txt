@@ -40,4 +40,4 @@ add_executable(fpl-modern-parser
         src/Essentials/MathUtils/MathParser/MathParser.h
         src/Essentials/MathUtils/MathParser/Utils/Converts.cpp
         src/Essentials/MathUtils/MathParser/Utils/Converts.h
-        )
+        src/Essentials/Definitions/Fonction.cpp src/Essentials/Definitions/Fonction.h)
