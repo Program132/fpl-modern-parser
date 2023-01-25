@@ -88,6 +88,7 @@ namespace FPL::Tokenizer {
                 case '+':
                 case '*':
                 case '=':
+                case ':':
                 case '<':
                 case '>':
                 case '[':
