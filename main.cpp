@@ -25,9 +25,7 @@ int main(int argc, char** argv) {
     std::string FileCode((std::istreambuf_iterator<char>(file)), (std::istreambuf_iterator<char>()));
 
     std::vector<Tokenizer::Token> FileCode_Tokens = FPL::Tokenizer::TokenBuilder::ParseToken(FileCode);
-
-    FPL::Parser::Parser parser;
-    parser.ParserCode(FileCode_Tokens);
+    FPL::Parser::Parser::ParserCode(FileCode_Tokens);
 
     return 0;
 }
