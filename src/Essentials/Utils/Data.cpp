@@ -75,4 +75,8 @@ namespace FPL::Data {
             Map_Variables[name].VariableType.Type = Type;
         }
     }
+
+    std::optional<FPL::FonctionDef> Data::getFonction(std::string& name) {
+        return this->Map_Fonctions[name];
+    }
 }

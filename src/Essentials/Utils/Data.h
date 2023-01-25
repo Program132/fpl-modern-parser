@@ -34,5 +34,7 @@ namespace FPL::Data {
         std::optional<FPL::VariableDef> getVariable(std::string& name);
         void updateValue(std::string &name, std::basic_string<char> value);
         void updateType(std::string& name, std::string& TypeName, Types::BUILTIN_TYPE Type);
+
+        std::optional<FPL::FonctionDef> getFonction(std::string& name);
     };
 }
