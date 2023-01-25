@@ -96,12 +96,6 @@ void FONCTION_forgotfirstParenthese(FPL::Data::Data& data) {
     exit(16);
 }
 
-void FONCTION_forgotsecondParenthese(FPL::Data::Data& data) {
-    std::cerr << "Vous devez fermer les parentheses pour cloturer l'insertion des arguments si vous en avez mis, ligne "
-              << data.current_token->TokenLineNumber - 1 << "." << std::endl;
-    exit(17);
-}
-
 void FONCTION_forgotargtype(FPL::Data::Data& data) {
     std::cerr << "Vous devez donner un le type de votre argument, ligne "
               << data.current_token->TokenLineNumber - 1 << "." << std::endl;
@@ -130,4 +124,40 @@ void FONCTION_argumentexist(FPL::Data::Data& data) {
     std::cerr << "L'argument existe deja, merci de donner un autre nom, ligne "
               << data.current_token->TokenLineNumber - 1 << "." << std::endl;
     exit(22);
+}
+
+void FONCTION_forgotnametocall(FPL::Data::Data& data){
+    std::cerr << "Vous devez preciser le nom de la fonction que vous souhaitez appeler, ligne "
+              << data.current_token->TokenLineNumber - 1 << "." << std::endl;
+    exit(23);
+}
+
+void FONCTION_forgotargumenttogivevalue(FPL::Data::Data& data) {
+    std::cerr << "Vous devez donner un argument, ligne "
+              << data.current_token->TokenLineNumber - 1 << "." << std::endl;
+    exit(24);
+}
+
+void FONCTION_forgotargumentvalue(FPL::Data::Data& data) {
+    std::cerr << "Vous devez transmettre une valeur a votre argument, ligne "
+              << data.current_token->TokenLineNumber - 1 << "." << std::endl;
+    exit(25);
+}
+
+void FONCTION_argumentDoesNotExist(FPL::Data::Data& data) {
+    std::cerr << "Cet argument n'existe pas, ligne "
+              << data.current_token->TokenLineNumber - 1 << "." << std::endl;
+    exit(26);
+}
+
+void FONCTION_noneedargs(FPL::Data::Data& data) {
+    std::cerr << "La fonction ne demande pas des arguments donc veuillez retirer ':' et mettre directement ';' à la fin de l'instruction, ligne "
+              << data.current_token->TokenLineNumber - 1 << "." << std::endl;
+    exit(27);
+}
+
+void FONCTION_didnotfindarg(FPL::Data::Data& data) {
+    std::cerr << "L'argument est introuvable, veuillez reessayer ou contacter l'equipe de developpement, ligne "
+              << data.current_token->TokenLineNumber - 1 << "." << std::endl;
+    exit(28);
 }
