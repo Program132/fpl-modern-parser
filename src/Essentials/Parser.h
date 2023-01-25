@@ -5,6 +5,9 @@
 #include <vector>
 #include <map>
 #include <optional>
+#include <sstream>
+#include <iterator>
+#include <algorithm>
 
 #include "Tokenizer.h"
 #include "Utils/Expecter.h"
@@ -36,5 +39,6 @@ namespace FPL::Parser {
         static void ConversionInstruction(FPL::Data::Data& data);
 
         static void DefinirInstruction(FPL::Data::Data& data);
+        static void AppelerInstruction(FPL::Data::Data& data);
     };
 }

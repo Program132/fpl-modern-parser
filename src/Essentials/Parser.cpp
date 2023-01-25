@@ -2,6 +2,77 @@
 
 namespace FPL::Parser {
 
+    void Parser::AppelerInstruction(FPL::Data::Data& data) {
+        auto possibleFunctionName = ExpectIdentifiant(data);
+        if (possibleFunctionName.has_value()) {
+            auto fonction = data.getFonction(possibleFunctionName->TokenText);
+
+            std::stringstream FonctionContentCode_STR;
+            for (auto it = fonction->FonctionContentCode.begin(); it != fonction->FonctionContentCode.end(); it++)    {
+                if (it != fonction->FonctionContentCode.begin()) {
+                    FonctionContentCode_STR << " ";
+                }
+                FonctionContentCode_STR << *it;
+            }
+
+            std::vector<Tokenizer::Token> FileCode_Tokens = FPL::Tokenizer::TokenBuilder::ParseToken(FonctionContentCode_STR.str());
+
+            if (fonction->FonctionNumberArgument < 1) {
+                if (ExpectOperator(data, ";").has_value()) {
+                    FPL::Parser::Parser::ParserCode(FileCode_Tokens);
+                } else {
+                    forgotEndInstructionOperator(data);
+                }
+            } else if (ExpectOperator(data, ":").has_value() && fonction->FonctionNumberArgument > 0) {
+                int totalArgs = fonction->FonctionNumberArgument;
+
+                if (totalArgs == 0) { FONCTION_noneedargs(data); }
+
+                while (totalArgs > 0) {
+                    auto possibleArgName = ExpectIdentifiant(data);
+                    if (!possibleArgName.has_value()) {
+                        FONCTION_forgotargumenttogivevalue(data);
+                    }
+
+                    auto possibleArgValue = ExpectValue(data);
+                    if (!possibleArgValue.has_value()) {
+                        FONCTION_forgotargumentvalue(data);
+                    }
+
+                    if (!fonction->isArgument(possibleArgName->TokenText)) {
+                        FONCTION_argumentDoesNotExist(data);
+                    }
+
+                    auto target_argument = fonction->getArgument(possibleArgName->TokenText);
+                    if (!target_argument.has_value()) {
+                        FONCTION_didnotfindarg(data);
+                    }
+                    fonction->updateValueOfArgument(target_argument.value(), possibleArgValue->StatementName);
+
+                    totalArgs -= 1;
+                    if (totalArgs == 0) { break; }
+                    else if (totalArgs > 0) {
+                        if (!ExpectOperator(data, ",").has_value()) {
+                            FONCTION_forgotaddarg(data);
+                        }
+                    }
+                }
+
+                for (auto const& a : fonction->AllFonctionArguments) {
+                    std::cout << a.second << std::endl;
+                }
+
+                if (!ExpectOperator(data, ";").has_value()) {
+                    forgotEndInstructionOperator(data);
+                }
+            } else {
+                // Erreur
+            }
+        } else {
+            FONCTION_forgotnametocall(data);
+        }
+    }
+
     void Parser::DefinirInstruction(FPL::Data::Data& data) {
         auto FonctionPossibleName = ExpectIdentifiant(data);
         if (FonctionPossibleName.has_value()) {
@@ -25,12 +96,12 @@ namespace FPL::Parser {
                     argument.ArgumentName = possibleArgName->TokenText;
                     argument.ArgumentType = Types::Types(possibleArgType->Name, possibleArgType->Type);
 
-                    if (fonction.isArgument(argument)) {
+                    if (fonction.isArgument(possibleArgName->TokenText)) {
                         FONCTION_argumentexist(data);
                     }
 
                     fonction.FonctionNumberArgument += 1;
-                    fonction.FonctionArguments.push_back(argument);
+                    fonction.AllFonctionArguments[possibleArgName->TokenText] = argument;
 
                     if (ExpectOperator(data, ")").has_value()) {
                         break;
@@ -340,7 +411,6 @@ namespace FPL::Parser {
             auto Id = ExpectIdentifiant(data);
             if (Id.has_value()) {
                 auto var = data.getVariable(Id->TokenText);
-
                 if (var.has_value()) {
                     std::string secondOp = "N/A";
 
@@ -369,10 +439,12 @@ namespace FPL::Parser {
                                 double v = stringToDouble(conditionValue->StatementName, ""); // L'autre valeur après l'/les opérateur(s)
                                 FPL::Instruction::Prints::printWithOperatorCondition_DOUBLE(secondOp, varValue, v);
                             }
-                        } else {
+                        }
+                        else {
                             needValueNextOperatorCondition(data);
                         }
-                    } else {
+                    }
+                    else {
                         if (secondOp != "N/A") {
                             data.incrementeTokens(data);
                             auto conditionValue = ExpectValue(data);
@@ -389,6 +461,8 @@ namespace FPL::Parser {
                             std::cout << var->VariableValue;
                         }
                     }
+                } else {
+                    variableDoesNotExist(data);
                 }
             }
 
@@ -425,12 +499,13 @@ namespace FPL::Parser {
             } else if (Instruction->TokenText == "definir") {
                 DefinirInstruction(data);
                 return true;
+            } else if (Instruction->TokenText == "appeler") {
+                AppelerInstruction(data);
+                return true;
             }
         }
         return false;
     }
-
-
 
     void Parser::ParserCode(std::vector<FPL::Tokenizer::Token>& Tokens) {
         Data::Data data(Tokens);
