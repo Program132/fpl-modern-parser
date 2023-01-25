@@ -4,8 +4,10 @@
 #include <vector>
 #include <ostream>
 #include <string>
+#include <map>
 #include <algorithm>
 #include <iterator>
+#include <optional>
 
 #include "../Types.h"
 
@@ -24,12 +26,14 @@ namespace FPL {
     public:
         std::string FonctionName;
         Types::Types FonctionType;
-        std::vector<FonctionArgumentDef> FonctionArguments;
+        std::map<std::string, FonctionArgumentDef> AllFonctionArguments;
         std::vector<std::string> FonctionContentCode;
         int FonctionNumberArgument = 0;
 
         friend std::ostream& operator<<(std::ostream& flux, FonctionDef const& var);
 
-        bool isArgument(FonctionArgumentDef const& argument);
+        bool isArgument(std::string const& argument);
+        std::optional<FonctionArgumentDef> getArgument(std::string const& argument);
+        void updateValueOfArgument(FonctionArgumentDef argument, std::string_view value);
     };
 }

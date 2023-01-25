@@ -1,13 +1,20 @@
 #include "Fonction.h"
 
 namespace FPL {
-    bool FonctionDef::isArgument(FonctionArgumentDef const& argument) {
-        auto it = std::find(this->FonctionArguments.begin(), this->FonctionArguments.end(), argument);
-
-        if (it != this->FonctionArguments.end()) {
-            return true;
-        }
+    bool FonctionDef::isArgument(std::string const& argument) {
+        if (this->AllFonctionArguments.contains(argument)) { return true; }
         return false;
+    }
+
+    std::optional<FonctionArgumentDef> FonctionDef::getArgument(const std::string &argument) {
+        if (this->isArgument(argument)) {
+            return this->AllFonctionArguments[argument];
+        }
+        return std::nullopt;
+    }
+
+    void FonctionDef::updateValueOfArgument(FonctionArgumentDef argument, std::string_view value) {
+        this->AllFonctionArguments[argument.ArgumentName].ArgumentValue = value;
     }
 
     std::ostream& operator<<(std::ostream &flux, FPL::FonctionDef const& f) {
