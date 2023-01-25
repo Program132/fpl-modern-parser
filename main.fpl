@@ -1,3 +1,5 @@
-definir main(entier a, entier b) {
-    envoyer a;
+definir main(entier a) {
+    envoyer 10;
 }
+
+appeler main : a 10;
