@@ -78,3 +78,20 @@ bool ExpectEgalOperators(FPL::Data::Data &data) {
     }
     return false;
 }
+
+std::optional<std::string> ExpectConditionOperator(FPL::Data::Data& data) {
+    if (ExpectOperator(data, ">").has_value()) {
+        if (ExpectOperator(data, "=").has_value()) {
+            return ">=";
+        }
+        return ">";
+    } else if (ExpectOperator(data, "<").has_value()) {
+        if (ExpectOperator(data, "=").has_value()) {
+            return "<=";
+        }
+        return "<";
+    } else if (ExpectOperator(data, "=").has_value()) {
+        return "=";
+    }
+    return std::nullopt;
+}
