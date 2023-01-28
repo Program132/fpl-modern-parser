@@ -13,6 +13,7 @@ namespace FPL {
         std::string VariableName;
         Types::Types VariableType;
         std::string VariableValue;
+        bool NeedDelete = false;
 
         friend std::ostream& operator<<(std::ostream& flux, VariableDef const& var);
 
