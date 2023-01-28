@@ -58,15 +58,13 @@ namespace FPL::Parser {
                     }
                 }
 
-                for (auto const& a : fonction->AllFonctionArguments) {
-                    std::cout << a.second << std::endl;
-                }
-
                 if (!ExpectOperator(data, ";").has_value()) {
                     forgotEndInstructionOperator(data);
                 }
+
+                executeContentCode(FileCode_Tokens, fonction);
             } else {
-                // Erreur
+                forgotEndInstructionOperator(data);
             }
         } else {
             FONCTION_forgotnametocall(data);
@@ -323,7 +321,7 @@ namespace FPL::Parser {
         }
     }
 
-    void Parser::VariableInstruction(FPL::Data::Data &data) {
+    void Parser::VariableInstruction(FPL::Data::Data &data, std::optional<FPL::FonctionDef>& fonction) {
         auto possibleType = ExpectType(data);
         if (possibleType.has_value()) {
             auto possibleVariableName = ExpectIdentifiant(data);
@@ -331,6 +329,8 @@ namespace FPL::Parser {
                 if (ExpectEgalOperators(data)) {
                     VariableDef variable;
                     variable.VariableName = possibleVariableName->TokenText;
+
+                    if (fonction.has_value()) { variable.NeedDelete = true; } // Si la variable est déclaré dans une fonction, à la fin de l'execution elle sera delete.
 
                     auto possibleValue = ExpectValue(data); // Valeur classique genre 5, 5.2, "salut"
                     if (possibleValue.has_value()) {
@@ -401,7 +401,7 @@ namespace FPL::Parser {
         }
     }
 
-    void Parser::PrintInstruction(FPL::Data::Data& data) {
+    void Parser::PrintInstruction(FPL::Data::Data& data, std::optional<FPL::FonctionDef>& fonction) {
         while (!ExpectOperator(data, ";").has_value()) {
             auto Value = ExpectValue(data);
             if (Value.has_value()) {
@@ -412,60 +412,14 @@ namespace FPL::Parser {
             if (Id.has_value()) {
                 auto var = data.getVariable(Id->TokenText);
                 if (var.has_value()) {
-                    std::string secondOp = "N/A";
-
-                    if (data.current_token->TokenText == "<") {
-                        secondOp = "<";
-                        data.incrementeTokens(data);
-                    } else if (data.current_token->TokenText == ">") {
-                        secondOp = ">";
-                        data.incrementeTokens(data);
-                    }
-
-                    if (data.current_token->TokenText == "=") {
-                        data.incrementeTokens(data);
-                        auto conditionValue = ExpectValue(data);
-                        if (conditionValue.has_value()) {
-                            if (conditionValue->StatementType.Name != "entier" && conditionValue->StatementType.Name != "decimal") {
-                                wrongType(data);
-                            }
-
-                            if (var->VariableType.Type == Types::INT) {
-                                int varValue = stringToInt(var->VariableValue, "");
-                                int v = stringToInt(conditionValue->StatementName, "");
-                                FPL::Instruction::Prints::printWithOperatorCondition_INT(secondOp, varValue, v);
-                            } else if (var->VariableType.Type == Types::DOUBLE) {
-                                double varValue = stringToDouble(var->VariableValue, ""); // La valeur de la variable
-                                double v = stringToDouble(conditionValue->StatementName, ""); // L'autre valeur après l'/les opérateur(s)
-                                FPL::Instruction::Prints::printWithOperatorCondition_DOUBLE(secondOp, varValue, v);
-                            }
-                        }
-                        else {
-                            needValueNextOperatorCondition(data);
-                        }
-                    }
-                    else {
-                        if (secondOp != "N/A") {
-                            data.incrementeTokens(data);
-                            auto conditionValue = ExpectValue(data);
-                            if (var->VariableType.Type == Types::INT) {
-                                int varValue = stringToInt(var->VariableValue, "");
-                                int v = stringToInt(conditionValue->StatementName, "");
-                                FPL::Instruction::Prints::printWithOperatorCondition_INT(secondOp, varValue, v);
-                            } else if (var->VariableType.Type == Types::DOUBLE) {
-                                double varValue = stringToDouble(var->VariableValue, ""); // La valeur de la variable
-                                double v = stringToDouble(conditionValue->StatementName, ""); // L'autre valeur après l'/les opérateur(s)
-                                FPL::Instruction::Prints::printWithOperatorCondition_DOUBLE(secondOp, varValue, v);
-                            }
-                        } else {
-                            std::cout << var->VariableValue;
-                        }
-                    }
+                    FPL::Instruction::Prints::managementPrint_VARIABLE(data, var.value());
+                } else if (fonction.has_value() && fonction->isArgument(Id->TokenText)) {
+                    auto arg = fonction->getArgument(Id->TokenText);
+                    FPL::Instruction::Prints::managementPrint_ARGUMENT(data, arg);
                 } else {
                     variableDoesNotExist(data);
                 }
             }
-
             if (ExpectOperator(data, ";").has_value()) {
                 break;
             }
@@ -475,14 +429,14 @@ namespace FPL::Parser {
 
 
 
-    bool Parser::ManagerInstruction(FPL::Data::Data &data) {
+    bool Parser::ManagerInstruction(FPL::Data::Data &data, std::optional<FPL::FonctionDef> fonction) {
         auto Instruction = ExpectIdentifiant(data);
         if (Instruction.has_value()) {
             if (Instruction->TokenText == "envoyer") {
-                PrintInstruction(data);
+                PrintInstruction(data, fonction);
                 return true;
             } else if (Instruction->TokenText == "variable") {
-                VariableInstruction(data);
+                VariableInstruction(data, fonction);
                 return true;
             } else if (Instruction->TokenText == "changer") {
                 ChangerInstruction(data);
@@ -507,11 +461,31 @@ namespace FPL::Parser {
         return false;
     }
 
+    void Parser::executeContentCode(std::vector<FPL::Tokenizer::Token>& Tokens, std::optional<FPL::FonctionDef>& fonction) {
+        Data::Data data(Tokens);
+
+        while (data.current_token != data.end_token) {
+            if (ManagerInstruction(data, fonction)) {
+
+            } else {
+                if (data.current_token->TokenText.empty()
+                    || data.current_token->TokenType == FPL::Tokenizer::ESPACE_VIDE
+                    || data.current_token->TokenText == " ") {
+                    continue;
+                }
+
+                std::cerr << "FONCTION_CONTENT_CODE( Identifier inconnu : " << data.current_token->TokenText << " : "
+                          << data.current_token->TokenLineNumber << ")" << std::endl;
+                ++data.current_token;
+            }
+        }
+    }
+
     void Parser::ParserCode(std::vector<FPL::Tokenizer::Token>& Tokens) {
         Data::Data data(Tokens);
 
         while (data.current_token != data.end_token) {
-            if (ManagerInstruction(data)) {
+            if (ManagerInstruction(data, std::nullopt)) {
 
             } else {
                 if (data.current_token->TokenText.empty()
