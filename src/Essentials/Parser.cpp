@@ -63,6 +63,15 @@ namespace FPL::Parser {
                 }
 
                 executeContentCode(FileCode_Tokens, fonction);
+
+                for (auto const& variables : data.Map_Variables) {
+                    if (variables.second.NeedDelete) {
+                        auto it = std::find(data.Map_Variables.begin(), data.Map_Variables.end(), variables);
+                        if (it != data.Map_Variables.end()) {
+                            data.Map_Variables.erase(it);
+                        }
+                    }
+                }
             } else {
                 forgotEndInstructionOperator(data);
             }
