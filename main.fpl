@@ -1,13 +1,10 @@
-variable entier a -> 10;
-envoyer a > 5;
-envoyer a >= 5;
-envoyer a < 5;
-envoyer a <= 5;
-envoyer a = 5;
-envoyer a = 10 " mdr";
+variable entier a -> 25;
 
-definir main (entier b) {
+definir main () {
+    variable entier b -> 15;
     envoyer b > 10;
 }
 
-appeler main : b 25;
+envoyer a;
+appeler main;
+envoyer b;
