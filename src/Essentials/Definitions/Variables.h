@@ -14,6 +14,7 @@ namespace FPL {
         Types::Types VariableType;
         std::string VariableValue;
         bool NeedDelete = false;
+        bool IsGlobal = false;
 
         friend std::ostream& operator<<(std::ostream& flux, VariableDef const& var);
 
