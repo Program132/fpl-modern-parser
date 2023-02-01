@@ -1,10 +1,9 @@
-variable entier a -> 25;
-
 definir main () {
-    variable entier b -> 15;
-    envoyer b > 10;
+    variable entier (globale) b -> 15;
+    variable entier a -> 10;
+    envoyer b;
+    envoyer a;
 }
 
-envoyer a;
 appeler main;
 envoyer b;
