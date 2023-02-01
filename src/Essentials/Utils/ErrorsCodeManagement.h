@@ -29,3 +29,5 @@ void FONCTION_forgotargumentvalue(FPL::Data::Data& data);
 void FONCTION_argumentDoesNotExist(FPL::Data::Data& data);
 void FONCTION_noneedargs(FPL::Data::Data& data);
 void FONCTION_didnotfindarg(FPL::Data::Data& data);
+void VAR_wrongparameter(FPL::Data::Data& data);
+void VAR_closeparameter(FPL::Data::Data& data);

@@ -161,3 +161,15 @@ void FONCTION_didnotfindarg(FPL::Data::Data& data) {
               << data.current_token->TokenLineNumber - 1 << "." << std::endl;
     exit(28);
 }
+
+void VAR_wrongparameter(FPL::Data::Data& data) {
+    std::cerr << "Vous devez preciser un parametre pour votre variable qui existe : 'globale', 'fonction', ligne "
+              << data.current_token->TokenLineNumber - 1 << "." << std::endl;
+    exit(29);
+}
+
+void VAR_closeparameter(FPL::Data::Data& data) {
+    std::cerr << "Vous devez fermer les parenthese si vous avez voulu introduire un parametre pour votre variable, ligne "
+              << data.current_token->TokenLineNumber - 1 << "." << std::endl;
+    exit(30);
+}
