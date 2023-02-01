@@ -18,15 +18,15 @@ namespace FPL::Parser {
             std::vector<Tokenizer::Token> FileCode_Tokens = FPL::Tokenizer::TokenBuilder::ParseToken(FonctionContentCode_STR.str());
 
             if (fonction->FonctionNumberArgument < 1) {
-                if (ExpectOperator(data, ";").has_value()) {
-                    FPL::Parser::Parser::ParserCode(FileCode_Tokens);
-                } else {
+                if (!ExpectOperator(data, ";").has_value()) {
                     forgotEndInstructionOperator(data);
                 }
             } else if (ExpectOperator(data, ":").has_value() && fonction->FonctionNumberArgument > 0) {
                 int totalArgs = fonction->FonctionNumberArgument;
 
                 if (totalArgs == 0) { FONCTION_noneedargs(data); }
+
+                std::cout << 0 << std::endl;
 
                 while (totalArgs > 0) {
                     auto possibleArgName = ExpectIdentifiant(data);
@@ -61,19 +61,23 @@ namespace FPL::Parser {
                 if (!ExpectOperator(data, ";").has_value()) {
                     forgotEndInstructionOperator(data);
                 }
-
-                executeContentCode(FileCode_Tokens, fonction);
-
-                for (auto const& variables : data.Map_Variables) {
-                    if (variables.second.NeedDelete) {
-                        auto it = std::find(data.Map_Variables.begin(), data.Map_Variables.end(), variables);
-                        if (it != data.Map_Variables.end()) {
-                            data.Map_Variables.erase(it);
-                        }
-                    }
-                }
             } else {
                 forgotEndInstructionOperator(data);
+            }
+
+            auto data_f = executeContentCode(FileCode_Tokens, fonction);
+
+            for (auto const& variables : data_f.Map_Variables) {
+                auto it = std::find(data_f.Map_Variables.begin(), data_f.Map_Variables.end(), variables);
+                if (it != data_f.Map_Variables.end()) {
+                    if (it->second.IsGlobal) {
+                        data.addVariableToMap(it->second.VariableName,
+                                              it->second.VariableValue,
+                                              it->second.VariableType,
+                                              it->second.NeedDelete,
+                                              it->second.IsGlobal);
+                    }
+                }
             }
         } else {
             FONCTION_forgotnametocall(data);
@@ -214,7 +218,12 @@ namespace FPL::Parser {
                     variable.VariableName = possibleName->TokenText;
                     variable.VariableType = FPL::Types::Types("decimal", FPL::Types::DOUBLE);
                     variable.VariableValue = std::to_string(result);
-                    data.addVariableToMap(variable.VariableName, variable.VariableValue, variable.VariableType);
+                    data.addVariableToMap(variable.VariableName,
+                                          variable.VariableValue,
+                                          variable.VariableType,
+                                          variable.NeedDelete,
+                                          variable.IsGlobal
+                    );
                 }
             } else {
                 forgotEgalOperators(data);
@@ -258,7 +267,12 @@ namespace FPL::Parser {
                             variable.VariableValue = finalValue;
                             variable.VariableType = FPL::Types::Types(possibleType->Name, possibleType->Type);
 
-                            data.addVariableToMap(variable.VariableName, variable.VariableValue, variable.VariableType);
+                            data.addVariableToMap(variable.VariableName,
+                                                  variable.VariableValue,
+                                                  variable.VariableType,
+                                                  variable.NeedDelete,
+                                                  variable.IsGlobal
+                            );
                         }
                     } else {
                         forgotEgalOperators(data);
@@ -278,7 +292,12 @@ namespace FPL::Parser {
                         variable.VariableValue = finalValue;
                         variable.VariableType = FPL::Types::Types(possibleType->Name, possibleType->Type);
 
-                        data.addVariableToMap(variable.VariableName, variable.VariableValue, variable.VariableType);
+                        data.addVariableToMap(variable.VariableName,
+                                              variable.VariableValue,
+                                              variable.VariableType,
+                                              variable.NeedDelete,
+                                              variable.IsGlobal
+                        );
                     } else {
                         forgotEgalOperators(data);
                     }
@@ -333,13 +352,37 @@ namespace FPL::Parser {
     void Parser::VariableInstruction(FPL::Data::Data &data, std::optional<FPL::FonctionDef>& fonction) {
         auto possibleType = ExpectType(data);
         if (possibleType.has_value()) {
+            VariableDef variable;
             auto possibleVariableName = ExpectIdentifiant(data);
-            if (possibleVariableName.has_value()) {
-                if (ExpectEgalOperators(data)) {
-                    VariableDef variable;
-                    variable.VariableName = possibleVariableName->TokenText;
 
-                    if (fonction.has_value()) { variable.NeedDelete = true; } // Si la variable est déclaré dans une fonction, à la fin de l'execution elle sera delete.
+            std::string possibleParamVar = "N/A";
+            if (!possibleVariableName.has_value() && ExpectOperator(data, "(").has_value()) {
+                auto parameterVariable = ExpectIdentifiant(data);
+                if (parameterVariable.has_value() && parameterVariable->TokenText == "globale") {
+                    variable.NeedDelete = false;
+                    variable.IsGlobal = true;
+                    possibleParamVar = "globale";
+                } else {
+                    VAR_wrongparameter(data);
+                }
+
+                if (!ExpectOperator(data, ")").has_value()) {
+                    VAR_closeparameter(data);
+                }
+
+                possibleVariableName = ExpectIdentifiant(data);
+                if (!possibleVariableName.has_value()) {
+                    forgotName(data);
+                }
+            }
+
+            if (possibleVariableName.has_value()) {
+
+                variable.VariableName = possibleVariableName->TokenText;
+
+                if (ExpectEgalOperators(data)) {
+                    if (fonction.has_value() && !variable.IsGlobal) { variable.NeedDelete = true; }
+                    // Si la variable est déclaré dans une fonction, à la fin de l'execution elle sera delete.
 
                     auto possibleValue = ExpectValue(data); // Valeur classique genre 5, 5.2, "salut"
                     if (possibleValue.has_value()) {
@@ -357,7 +400,12 @@ namespace FPL::Parser {
                                 variable.VariableValue = possibleValue->StatementName;
                                 variable.VariableType = FPL::Types::Types(possibleType->Name, possibleType->Type);
 
-                                data.addVariableToMap(variable.VariableName, variable.VariableValue, variable.VariableType);
+                                data.addVariableToMap(variable.VariableName,
+                                                      variable.VariableValue,
+                                                      variable.VariableType,
+                                                      variable.NeedDelete,
+                                                      variable.IsGlobal
+                                                      );
                             } else {
                                 forgotEndInstructionOperator(data);
                             }
@@ -376,7 +424,12 @@ namespace FPL::Parser {
                                             differentTypes(data);
                                         }
 
-                                        data.addVariableToMap(variable.VariableName, variable.VariableValue, variable.VariableType);
+                                        data.addVariableToMap(variable.VariableName,
+                                                              variable.VariableValue,
+                                                              variable.VariableType,
+                                                              variable.NeedDelete,
+                                                              variable.IsGlobal
+                                        );
                                     }
                                 } else {
                                     forgotEndInstructionOperator(data);
@@ -387,7 +440,12 @@ namespace FPL::Parser {
                                         variable.VariableValue = possibleId->TokenText;
                                         variable.VariableType = FPL::Types::Types("bool", Types::BOOL);
 
-                                        data.addVariableToMap(variable.VariableName, variable.VariableValue, variable.VariableType);
+                                        data.addVariableToMap(variable.VariableName,
+                                                              variable.VariableValue,
+                                                              variable.VariableType,
+                                                              variable.NeedDelete,
+                                                              variable.IsGlobal
+                                        );
                                     } else {
                                         forgotEndInstructionOperator(data);
                                     }
@@ -419,8 +477,8 @@ namespace FPL::Parser {
 
             auto Id = ExpectIdentifiant(data);
             if (Id.has_value()) {
-                auto var = data.getVariable(Id->TokenText);
-                if (var.has_value()) {
+                if (data.isVariable(Id->TokenText)) {
+                    auto var = data.getVariable(Id->TokenText);
                     FPL::Instruction::Prints::managementPrint_VARIABLE(data, var.value());
                 } else if (fonction.has_value() && fonction->isArgument(Id->TokenText)) {
                     auto arg = fonction->getArgument(Id->TokenText);
@@ -470,7 +528,7 @@ namespace FPL::Parser {
         return false;
     }
 
-    void Parser::executeContentCode(std::vector<FPL::Tokenizer::Token>& Tokens, std::optional<FPL::FonctionDef>& fonction) {
+    Data::Data Parser::executeContentCode(std::vector<FPL::Tokenizer::Token>& Tokens, std::optional<FPL::FonctionDef>& fonction) {
         Data::Data data(Tokens);
 
         while (data.current_token != data.end_token) {
@@ -488,6 +546,7 @@ namespace FPL::Parser {
                 ++data.current_token;
             }
         }
+        return data;
     }
 
     void Parser::ParserCode(std::vector<FPL::Tokenizer::Token>& Tokens) {

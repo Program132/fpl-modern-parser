@@ -30,7 +30,7 @@ namespace FPL::Parser {
 
 
     private:
-        static void executeContentCode(std::vector<FPL::Tokenizer::Token>& Tokens, std::optional<FPL::FonctionDef>& fonction);
+        static Data::Data executeContentCode(std::vector<FPL::Tokenizer::Token>& Tokens, std::optional<FPL::FonctionDef>& fonction);
         static bool ManagerInstruction(FPL::Data::Data &data, std::optional<FPL::FonctionDef> fonction);
 
         static void PrintInstruction(FPL::Data::Data& data, std::optional<FPL::FonctionDef>& fonction);
