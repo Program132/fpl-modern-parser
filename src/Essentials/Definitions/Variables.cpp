@@ -2,7 +2,7 @@
 
 namespace FPL {
     std::ostream& operator<<(std::ostream &flux, FPL::VariableDef const& var) {
-        flux << "Une variable du nom de " << var.VariableName << " a pour valeur " << var.VariableValue << " et a pour type " << var.VariableType.Name;
+        flux << "Une variable du nom de " << var.VariableName << ", a pour valeur " << var.VariableValue << ", pour type " << var.VariableType.Name << ", globale : " << var.IsGlobal;
         return flux;
     }
 
