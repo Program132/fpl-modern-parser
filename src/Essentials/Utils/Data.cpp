@@ -29,11 +29,13 @@ namespace FPL::Data {
         };
     }
 
-    void Data::addVariableToMap(std::string& name, std::string& value, FPL::Types::Types& type) {
+    void Data::addVariableToMap(std::string& name, std::string& value, FPL::Types::Types& type, bool del, bool globale) {
         VariableDef newVariable;
         newVariable.VariableName = name;
         newVariable.VariableValue = value;
         newVariable.VariableType = type;
+        newVariable.NeedDelete = del;
+        newVariable.IsGlobal = globale;
         Map_Variables[newVariable.VariableName] = newVariable;
     }
 

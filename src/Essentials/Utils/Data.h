@@ -29,7 +29,7 @@ namespace FPL::Data {
         std::map<std::string, FPL::VariableDef> Map_Variables;
         std::map<std::string, FPL::FonctionDef> Map_Fonctions;
 
-        void addVariableToMap(std::string& name, std::string& value, FPL::Types::Types& type);
+        void addVariableToMap(std::string& name, std::string& value, FPL::Types::Types& type, bool del, bool globale);
         bool isVariable(std::string& name) const;
         std::optional<FPL::VariableDef> getVariable(std::string& name);
         void updateValue(std::string &name, std::basic_string<char> value);
