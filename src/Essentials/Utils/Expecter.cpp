@@ -58,7 +58,7 @@ std::optional<Statement::Statement> ExpectValue(FPL::Data::Data &data) {
         Statement::Statement stringLitteralStatement(
                 Statement::StatementKind::LITTERAL,
                 data.current_token->TokenText,
-                Types::Types("text", Types::STRING)
+                Types::Types("texte", Types::STRING)
         );
         res = stringLitteralStatement;
 
