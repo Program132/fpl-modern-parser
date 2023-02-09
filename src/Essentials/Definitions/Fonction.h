@@ -29,6 +29,7 @@ namespace FPL {
         std::map<std::string, FonctionArgumentDef> AllFonctionArguments;
         std::vector<std::string> FonctionContentCode;
         int FonctionNumberArgument = 0;
+        std::string ReturnValue = "N/A";
 
         friend std::ostream& operator<<(std::ostream& flux, FonctionDef const& var);
 
