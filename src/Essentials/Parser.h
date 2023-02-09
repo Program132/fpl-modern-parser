@@ -42,5 +42,6 @@ namespace FPL::Parser {
 
         static void DefinirInstruction(FPL::Data::Data& data);
         static void AppelerInstruction(FPL::Data::Data& data);
+        static void RenvoyerInstruction(FPL::Data::Data& data, std::optional<FPL::FonctionDef> fonction);
     };
 }

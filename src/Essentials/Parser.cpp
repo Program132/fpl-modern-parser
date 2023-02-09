@@ -2,6 +2,46 @@
 
 namespace FPL::Parser {
 
+    void Parser::RenvoyerInstruction(FPL::Data::Data &data, std::optional<FPL::FonctionDef> fonction) {
+        if (!fonction.has_value()) {
+            RETURN_noinfonction(data);
+        }
+
+        std::string finalValue;
+
+        auto returnValue = ExpectValue(data);
+        if (returnValue.has_value()) {
+            finalValue = returnValue->StatementName;
+            data.ReturnType = returnValue->StatementType;
+        } else {
+            auto returnId = ExpectIdentifiant(data);
+
+            if (returnId.has_value() && data.isVariable(returnId->TokenText) && returnId->TokenText != "vrai" && returnId->TokenText != "faux") {
+                auto variable = data.getVariable(returnId->TokenText);
+                if (variable.has_value()) { finalValue = variable->VariableValue; data.ReturnType = variable->VariableType; }
+            } else if (returnId.has_value() && returnId->TokenText == "vrai") {
+                finalValue = "vrai";
+                data.ReturnType = Types::Types("bool", Types::BOOL);
+            } else if (returnId.has_value() && returnId->TokenText == "faux") {
+                finalValue = "faux";
+                data.ReturnType = Types::Types("bool", Types::BOOL);
+            } else if (returnId.has_value() && fonction->isArgument(returnId->TokenText)) {
+                auto argument = fonction->getArgument(returnId->TokenText);
+                if (argument.has_value()) { finalValue = argument->ArgumentValue; data.ReturnType = argument->ArgumentType; }
+            } else {
+                forgotValue(data);
+            }
+        }
+
+        if (!ExpectOperator(data, ";").has_value()) {
+            forgotEndInstructionOperator(data);
+        }
+
+        fonction->ReturnValue = finalValue;
+        data.HasReturnValue = true;
+        data.ReturnValue = finalValue;
+    }
+
     void Parser::AppelerInstruction(FPL::Data::Data& data) {
         auto possibleFunctionName = ExpectIdentifiant(data);
         if (possibleFunctionName.has_value()) {
@@ -26,8 +66,6 @@ namespace FPL::Parser {
 
                 if (totalArgs == 0) { FONCTION_noneedargs(data); }
 
-                std::cout << 0 << std::endl;
-
                 while (totalArgs > 0) {
                     auto possibleArgName = ExpectIdentifiant(data);
                     if (!possibleArgName.has_value()) {
@@ -35,8 +73,20 @@ namespace FPL::Parser {
                     }
 
                     auto possibleArgValue = ExpectValue(data);
-                    if (!possibleArgValue.has_value()) {
-                        FONCTION_forgotargumentvalue(data);
+                    std::string possibleArgFinalValue;
+                    if (possibleArgValue.has_value()) {
+                        possibleArgFinalValue = possibleArgValue->StatementName;
+                    } else {
+                        auto possibleBoolValue = ExpectIdentifiant(data);
+                        if (possibleBoolValue.has_value()) {
+                            if (possibleBoolValue->TokenText == "vrai" || possibleBoolValue->TokenText == "faux") {
+                                possibleArgFinalValue = possibleBoolValue->TokenText;
+                            } else {
+                                forgotValue(data);
+                            }
+                        } else {
+                            forgotValue(data);
+                        }
                     }
 
                     if (!fonction->isArgument(possibleArgName->TokenText)) {
@@ -47,7 +97,7 @@ namespace FPL::Parser {
                     if (!target_argument.has_value()) {
                         FONCTION_didnotfindarg(data);
                     }
-                    fonction->updateValueOfArgument(target_argument.value(), possibleArgValue->StatementName);
+                    fonction->updateValueOfArgument(target_argument.value(), possibleArgFinalValue);
 
                     totalArgs -= 1;
                     if (totalArgs == 0) { break; }
@@ -125,6 +175,9 @@ namespace FPL::Parser {
                     // On récupère le contenu de la fonction
                     while (!ExpectOperator(data, "}").has_value()) {
                         auto currentToken = data.current_token;
+                        if (currentToken->TokenType == FPL::Tokenizer::CHAINE_LITTERAL) {
+                            currentToken->TokenText = "\"" + currentToken->TokenText += "\"";
+                        }
                         fonction.FonctionContentCode.push_back(currentToken->TokenText);
                         data.incrementeTokens(data);
 
@@ -353,30 +406,21 @@ namespace FPL::Parser {
         auto possibleType = ExpectType(data);
         if (possibleType.has_value()) {
             VariableDef variable;
+            std::string possibleParamVar = "N/A";
             auto possibleVariableName = ExpectIdentifiant(data);
 
-            std::string possibleParamVar = "N/A";
-            if (!possibleVariableName.has_value() && ExpectOperator(data, "(").has_value()) {
-                auto parameterVariable = ExpectIdentifiant(data);
-                if (parameterVariable.has_value() && parameterVariable->TokenText == "globale") {
-                    variable.NeedDelete = false;
-                    variable.IsGlobal = true;
-                    possibleParamVar = "globale";
-                } else {
-                    VAR_wrongparameter(data);
-                }
-
-                if (!ExpectOperator(data, ")").has_value()) {
-                    VAR_closeparameter(data);
-                }
-
-                possibleVariableName = ExpectIdentifiant(data);
-                if (!possibleVariableName.has_value()) {
-                    forgotName(data);
-                }
-            }
-
             if (possibleVariableName.has_value()) {
+                if (possibleVariableName->TokenText == "globale") {
+                    variable.IsGlobal = true;
+                    variable.NeedDelete = false;
+                    possibleParamVar = "globale";
+                } else if (possibleVariableName->TokenText == "fonction") {
+                    possibleParamVar = "fonction";
+                }
+
+                if (possibleParamVar != "N/A") {
+                    possibleVariableName = ExpectIdentifiant(data);
+                }
 
                 variable.VariableName = possibleVariableName->TokenText;
 
@@ -385,7 +429,7 @@ namespace FPL::Parser {
                     // Si la variable est déclaré dans une fonction, à la fin de l'execution elle sera delete.
 
                     auto possibleValue = ExpectValue(data); // Valeur classique genre 5, 5.2, "salut"
-                    if (possibleValue.has_value()) {
+                    if (possibleValue.has_value() && possibleParamVar != "fonction") {
                         if (possibleType->Type == Types::BOOL) {
                             BoolNotLikeValue(data);
                         } else {
@@ -410,47 +454,157 @@ namespace FPL::Parser {
                                 forgotEndInstructionOperator(data);
                             }
                         }
-                    } else { // Pour les variables déjà déclaré ou le type bool
+                    }
+                    else { // Pour les variables déjà déclaré ou le type bool + pour les returns
                         auto possibleId = ExpectIdentifiant(data);
                         if (possibleId.has_value()) {
-                            if (data.isVariable(possibleId->TokenText)) {
-                                if (ExpectOperator(data, ";").has_value()) {
-                                    auto oldVar  = data.getVariable(possibleId->TokenText);
-                                    if (oldVar.has_value()) {
-                                        variable.VariableValue = oldVar->VariableValue;
-                                        variable.VariableType = FPL::Types::Types(possibleType->Name, possibleType->Type);
+                            if (possibleParamVar == "fonction") {
+                                variable.VariableType = Types::Types(possibleType->Name, possibleType->Type);
 
-                                        if (variable != oldVar) {
-                                            differentTypes(data);
+                                auto possibleFunction = data.getFonction(possibleId->TokenText);
+                                if (possibleFunction.has_value()) {
+
+                                    std::stringstream FonctionContentCode_STR;
+                                    for (auto it = possibleFunction->FonctionContentCode.begin(); it != possibleFunction->FonctionContentCode.end(); it++)    {
+                                        if (it != possibleFunction->FonctionContentCode.begin()) {
+                                            FonctionContentCode_STR << " ";
                                         }
-
-                                        data.addVariableToMap(variable.VariableName,
-                                                              variable.VariableValue,
-                                                              variable.VariableType,
-                                                              variable.NeedDelete,
-                                                              variable.IsGlobal
-                                        );
+                                        FonctionContentCode_STR << *it;
                                     }
-                                } else {
-                                    forgotEndInstructionOperator(data);
-                                }
-                            } else if (possibleId->TokenText == "vrai" || possibleId->TokenText == "faux") {
-                                if (possibleType->Type == Types::BOOL) {
-                                    if (ExpectOperator(data, ";").has_value()) {
-                                        variable.VariableValue = possibleId->TokenText;
-                                        variable.VariableType = FPL::Types::Types("bool", Types::BOOL);
 
-                                        data.addVariableToMap(variable.VariableName,
-                                                              variable.VariableValue,
-                                                              variable.VariableType,
-                                                              variable.NeedDelete,
-                                                              variable.IsGlobal
-                                        );
+                                    std::vector<Tokenizer::Token> FileCode_Tokens = FPL::Tokenizer::TokenBuilder::ParseToken(FonctionContentCode_STR.str());
+
+                                    if (ExpectOperator(data, ":").has_value() && possibleFunction->FonctionNumberArgument > 0) {
+                                        int totalArgs = possibleFunction->FonctionNumberArgument;
+
+                                        if (totalArgs == 0) { FONCTION_noneedargs(data); }
+
+                                        while (totalArgs > 0) {
+                                            auto possibleArgName = ExpectIdentifiant(data);
+                                            if (!possibleArgName.has_value()) {
+                                                FONCTION_forgotargumenttogivevalue(data);
+                                            }
+
+                                            auto possibleArgValue = ExpectValue(data);
+                                            std::string possibleArgFinalValue;
+                                            if (possibleArgValue.has_value()) {
+                                                possibleArgFinalValue = possibleArgValue->StatementName;
+                                            } else {
+                                                auto possibleBoolValue = ExpectIdentifiant(data);
+                                                if (possibleBoolValue.has_value()) {
+                                                    if (possibleBoolValue->TokenText == "vrai" || possibleBoolValue->TokenText == "faux") {
+                                                        possibleArgFinalValue = possibleBoolValue->TokenText;
+                                                    } else {
+                                                        forgotValue(data);
+                                                    }
+                                                } else {
+                                                    forgotValue(data);
+                                                }
+                                            }
+
+                                            if (!possibleFunction->isArgument(possibleArgName->TokenText)) {
+                                                FONCTION_argumentDoesNotExist(data);
+                                            }
+
+                                            auto target_argument = possibleFunction->getArgument(
+                                                    possibleArgName->TokenText);
+
+                                            if (!target_argument.has_value()) {
+                                                FONCTION_didnotfindarg(data);
+                                            }
+
+                                            possibleFunction->updateValueOfArgument(target_argument.value(),possibleArgFinalValue);
+
+                                            totalArgs -= 1;
+                                            if (totalArgs == 0) { break; }
+                                            else if (totalArgs > 0) {
+                                                if (!ExpectOperator(data, ",").has_value()) {
+                                                    FONCTION_forgotaddarg(data);
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    if (!ExpectOperator(data, ";").has_value()) {
+                                        forgotEndInstructionOperator(data);
+                                    }
+
+                                    auto data_f = executeContentCode(FileCode_Tokens, possibleFunction);
+
+                                    if (!data_f.HasReturnValue) {
+                                        RETURN_noreturn(data);
+                                    }
+
+                                    std::string returnValue = data_f.ReturnValue;
+                                    Types::Types returnType = data_f.ReturnType;
+
+                                    if (returnType.Type != variable.VariableType.Type) {
+                                        RETURN_wrongtype(data);
+                                    }
+
+                                    for (auto const& variables : data_f.Map_Variables) {
+                                        auto it = std::find(data_f.Map_Variables.begin(), data_f.Map_Variables.end(), variables);
+                                        if (it != data_f.Map_Variables.end()) {
+                                            if (it->second.IsGlobal) {
+                                                data.addVariableToMap(it->second.VariableName,
+                                                                      it->second.VariableValue,
+                                                                      it->second.VariableType,
+                                                                      it->second.NeedDelete,
+                                                                      it->second.IsGlobal);
+                                            }
+                                        }
+                                    }
+
+                                    variable.VariableValue = returnValue;
+
+                                    data.addVariableToMap(variable.VariableName,
+                                                          variable.VariableValue,
+                                                          variable.VariableType,
+                                                          variable.NeedDelete,
+                                                          variable.IsGlobal);
+                                } else {
+                                    FONCTION_doesnotexist(data);
+                                }
+                            } else {
+                                if (data.isVariable(possibleId->TokenText)) {
+                                    if (ExpectOperator(data, ";").has_value()) {
+                                        auto oldVar  = data.getVariable(possibleId->TokenText);
+                                        if (oldVar.has_value()) {
+                                            variable.VariableValue = oldVar->VariableValue;
+                                            variable.VariableType = FPL::Types::Types(possibleType->Name, possibleType->Type);
+
+                                            if (variable != oldVar) {
+                                                differentTypes(data);
+                                            }
+
+                                            data.addVariableToMap(variable.VariableName,
+                                                                  variable.VariableValue,
+                                                                  variable.VariableType,
+                                                                  variable.NeedDelete,
+                                                                  variable.IsGlobal
+                                            );
+                                        }
                                     } else {
                                         forgotEndInstructionOperator(data);
                                     }
-                                } else {
-                                    wrongTypeForBool(data);
+                                } else if (possibleId->TokenText == "vrai" || possibleId->TokenText == "faux") {
+                                    if (possibleType->Type == Types::BOOL) {
+                                        if (ExpectOperator(data, ";").has_value()) {
+                                            variable.VariableValue = possibleId->TokenText;
+                                            variable.VariableType = FPL::Types::Types("bool", Types::BOOL);
+
+                                            data.addVariableToMap(variable.VariableName,
+                                                                  variable.VariableValue,
+                                                                  variable.VariableType,
+                                                                  variable.NeedDelete,
+                                                                  variable.IsGlobal
+                                            );
+                                        } else {
+                                            forgotEndInstructionOperator(data);
+                                        }
+                                    } else {
+                                        wrongTypeForBool(data);
+                                    }
                                 }
                             }
                         } else {
@@ -523,6 +677,9 @@ namespace FPL::Parser {
             } else if (Instruction->TokenText == "appeler") {
                 AppelerInstruction(data);
                 return true;
+            } else if (Instruction->TokenText == "renvoyer") {
+                RenvoyerInstruction(data, fonction);
+                return true;
             }
         }
         return false;
@@ -541,8 +698,8 @@ namespace FPL::Parser {
                     continue;
                 }
 
-                std::cerr << "FONCTION_CONTENT_CODE( Identifier inconnu : " << data.current_token->TokenText << " : "
-                          << data.current_token->TokenLineNumber << ")" << std::endl;
+                std::cerr << "Identifier inconnu : " << data.current_token->TokenText << " : "
+                          << data.current_token->TokenLineNumber << std::endl;
                 ++data.current_token;
             }
         }
