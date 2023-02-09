@@ -1,9 +1,7 @@
 definir main () {
-    variable entier (globale) b -> 15;
-    variable entier a -> 10;
-    envoyer b;
-    envoyer a;
+    variable bool a -> vrai;
+    renvoyer a;
 }
 
-appeler main;
-envoyer b;
+variable bool fonction c -> main;
+envoyer c;
