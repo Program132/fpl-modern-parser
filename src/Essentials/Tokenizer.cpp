@@ -25,7 +25,6 @@ namespace FPL::Tokenizer {
                     default:
                         throw std::runtime_error(std::string("unknown escape sequence: \\") + std::string(1, element) +
                                             " in string on line " + currentToken.TokenText + ".");
-                        break;
                 }
                 currentToken.TokenType = CHAINE_LITTERAL;
                 continue;
