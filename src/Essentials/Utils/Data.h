@@ -36,5 +36,8 @@ namespace FPL::Data {
         void updateType(std::string& name, std::string& TypeName, Types::BUILTIN_TYPE Type);
 
         std::optional<FPL::FonctionDef> getFonction(std::string& name);
+        bool HasReturnValue = false;
+        std::string ReturnValue = "N/A";
+        Types::Types ReturnType;
     };
 }
