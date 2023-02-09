@@ -31,3 +31,8 @@ void FONCTION_noneedargs(FPL::Data::Data& data);
 void FONCTION_didnotfindarg(FPL::Data::Data& data);
 void VAR_wrongparameter(FPL::Data::Data& data);
 void VAR_closeparameter(FPL::Data::Data& data);
+void FONCTION_doesnotexist(FPL::Data::Data& data);
+void RETURN_noinfonction(FPL::Data::Data& data);
+void RETURN_novariablefound(FPL::Data::Data& data);
+void RETURN_noreturn(FPL::Data::Data& data);
+void RETURN_wrongtype(FPL::Data::Data& data);
