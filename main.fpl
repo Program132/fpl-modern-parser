@@ -1,7 +1,3 @@
-definir main () {
-    variable bool a -> vrai;
-    renvoyer a;
-}
+importer "import.fpl";
 
-variable bool fonction c -> main;
-envoyer c;
+envoyer a;
