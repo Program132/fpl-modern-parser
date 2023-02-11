@@ -36,3 +36,4 @@ void RETURN_noinfonction(FPL::Data::Data& data);
 void RETURN_novariablefound(FPL::Data::Data& data);
 void RETURN_noreturn(FPL::Data::Data& data);
 void RETURN_wrongtype(FPL::Data::Data& data);
+void IMPORT_needfilename(FPL::Data::Data& data);

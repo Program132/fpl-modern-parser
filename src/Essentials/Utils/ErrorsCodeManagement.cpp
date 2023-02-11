@@ -203,3 +203,9 @@ void RETURN_wrongtype(FPL::Data::Data& data) {
               << data.current_token->TokenLineNumber << "." << std::endl;
     exit(33);
 }
+
+void IMPORT_needfilename(FPL::Data::Data& data) {
+    std::cerr << "Vous devez donner le nom du fichier entre guillements : '\"', ligne "
+              << data.current_token->TokenLineNumber << "." << std::endl;
+    exit(33);
+}
