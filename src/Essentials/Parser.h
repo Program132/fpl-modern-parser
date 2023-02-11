@@ -30,7 +30,7 @@ namespace FPL::Parser {
 
 
     private:
-        static Data::Data executeContentCode(std::vector<FPL::Tokenizer::Token>& Tokens, std::optional<FPL::FonctionDef>& fonction);
+        static Data::Data ParserCode_Func(std::vector<FPL::Tokenizer::Token>& Tokens, std::optional<FPL::FonctionDef>& fonction);
         static bool ManagerInstruction(FPL::Data::Data &data, std::optional<FPL::FonctionDef> fonction);
 
         static void PrintInstruction(FPL::Data::Data& data, std::optional<FPL::FonctionDef>& fonction);
@@ -39,6 +39,9 @@ namespace FPL::Parser {
         static void InputInstruction(FPL::Data::Data& data);
         static void MathInstruction(FPL::Data::Data& data);
         static void ConversionInstruction(FPL::Data::Data& data);
+
+        static void ImporterInstruction(FPL::Data::Data& data, std::optional<FPL::FonctionDef> fonction);
+        static Data::Data ParserCode_Import(std::vector<FPL::Tokenizer::Token>& Tokens, std::optional<FPL::FonctionDef>& fonction);
 
         static void DefinirInstruction(FPL::Data::Data& data);
         static void AppelerInstruction(FPL::Data::Data& data);

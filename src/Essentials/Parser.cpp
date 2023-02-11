@@ -2,6 +2,40 @@
 
 namespace FPL::Parser {
 
+    void Parser::ImporterInstruction(FPL::Data::Data& data, std::optional<FPL::FonctionDef> fonction) {
+        auto possibleFileName = ExpectValue(data);
+        if (possibleFileName.has_value() && possibleFileName->StatementType.Type == Types::STRING) {
+
+            std::ifstream file { possibleFileName->StatementName};
+            if (!file) {
+                IMPORT_needfilename(data);
+            }
+
+            if (!ExpectOperator(data, ";").has_value()) {
+                forgotEndInstructionOperator(data);
+            }
+
+            std::string Import_ContentCode((std::istreambuf_iterator<char>(file)), (std::istreambuf_iterator<char>()));
+            std::vector<Tokenizer::Token> ImportFile_Tokens = FPL::Tokenizer::TokenBuilder::ParseToken(Import_ContentCode);
+            auto data_ImportFile = ParserCode_Import(ImportFile_Tokens, fonction);
+
+            for (auto const& variables : data_ImportFile.Map_Variables) {
+                auto it = std::find(data_ImportFile.Map_Variables.begin(), data_ImportFile.Map_Variables.end(), variables);
+                if (it != data_ImportFile.Map_Variables.end()) {
+                    if (it->second.IsGlobal) {
+                        data.addVariableToMap(it->second.VariableName,
+                                              it->second.VariableValue,
+                                              it->second.VariableType,
+                                              it->second.NeedDelete,
+                                              it->second.IsGlobal);
+                    }
+                }
+            }
+        } else {
+            IMPORT_needfilename(data);
+        }
+    }
+
     void Parser::RenvoyerInstruction(FPL::Data::Data &data, std::optional<FPL::FonctionDef> fonction) {
         if (!fonction.has_value()) {
             RETURN_noinfonction(data);
@@ -115,7 +149,7 @@ namespace FPL::Parser {
                 forgotEndInstructionOperator(data);
             }
 
-            auto data_f = executeContentCode(FileCode_Tokens, fonction);
+            auto data_f = ParserCode_Func(FileCode_Tokens, fonction);
 
             for (auto const& variables : data_f.Map_Variables) {
                 auto it = std::find(data_f.Map_Variables.begin(), data_f.Map_Variables.end(), variables);
@@ -529,7 +563,7 @@ namespace FPL::Parser {
                                         forgotEndInstructionOperator(data);
                                     }
 
-                                    auto data_f = executeContentCode(FileCode_Tokens, possibleFunction);
+                                    auto data_f = ParserCode_Func(FileCode_Tokens, possibleFunction);
 
                                     if (!data_f.HasReturnValue) {
                                         RETURN_noreturn(data);
@@ -680,12 +714,36 @@ namespace FPL::Parser {
             } else if (Instruction->TokenText == "renvoyer") {
                 RenvoyerInstruction(data, fonction);
                 return true;
+            } else if (Instruction->TokenText == "importer") {
+                ImporterInstruction(data, fonction);
+                return true;
             }
         }
         return false;
     }
 
-    Data::Data Parser::executeContentCode(std::vector<FPL::Tokenizer::Token>& Tokens, std::optional<FPL::FonctionDef>& fonction) {
+    Data::Data Parser::ParserCode_Import(std::vector<FPL::Tokenizer::Token>& Tokens, std::optional<FPL::FonctionDef>& fonction) {
+        Data::Data data(Tokens);
+
+        while (data.current_token != data.end_token) {
+            if (ManagerInstruction(data, fonction)) {
+
+            } else {
+                if (data.current_token->TokenText.empty()
+                    || data.current_token->TokenType == FPL::Tokenizer::ESPACE_VIDE
+                    || data.current_token->TokenText == " ") {
+                    continue;
+                }
+
+                std::cerr << "Identifier inconnu : " << data.current_token->TokenText << " : "
+                          << data.current_token->TokenLineNumber << std::endl;
+                ++data.current_token;
+            }
+        }
+        return data;
+    }
+
+    Data::Data Parser::ParserCode_Func(std::vector<FPL::Tokenizer::Token>& Tokens, std::optional<FPL::FonctionDef>& fonction) {
         Data::Data data(Tokens);
 
         while (data.current_token != data.end_token) {
